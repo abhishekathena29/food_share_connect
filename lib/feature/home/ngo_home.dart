@@ -7,9 +7,9 @@ class NGOHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Homepage"),
+        title: const Text("Page is not Changed"),
       ),
-      body: Column(
+      body: const Column(
         children: [],
       ),
     );
