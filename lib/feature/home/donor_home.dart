@@ -6,10 +6,11 @@ class DonorHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("HomePage"),
+      ),
       body: Column(
-        children: [
-          
-        ],
+        children: [],
       ),
     );
   }
