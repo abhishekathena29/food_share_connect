@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "858092692119",
+    "project_id": "foodshareconnect-d9939",
+    "storage_bucket": "foodshareconnect-d9939.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:858092692119:android:089825de848db3dd973fd2",
+        "android_client_info": {
+          "package_name": "com.example.ngo_donor_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6JDhLzZMUiUNXtNRv-9WG4ijJVzNa3rA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
