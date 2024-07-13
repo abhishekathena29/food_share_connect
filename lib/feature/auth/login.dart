@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:ngo_donor_app/feature/auth/register.dart';
+import 'package:ngo_donor_app/feature/home/donor_home.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -50,15 +50,23 @@ class LoginPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20))),
               ),
               const SizedBox(height: 30),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
-                decoration: BoxDecoration(
-                    color: const Color(0xff038C8C),
-                    borderRadius: BorderRadius.circular(30)),
-                child: const Text(
-                  'Log In',
-                  style: TextStyle(fontSize: 25, color: Colors.white),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const DonorHome()));
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+                  decoration: BoxDecoration(
+                      color: const Color(0xff038C8C),
+                      borderRadius: BorderRadius.circular(30)),
+                  child: const Text(
+                    'Log In',
+                    style: TextStyle(fontSize: 25, color: Colors.white),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
