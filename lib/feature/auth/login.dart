@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ngo_donor_app/feature/auth/register.dart';
 import 'package:ngo_donor_app/feature/home/donor_home.dart';
@@ -51,11 +52,26 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const DonorHome()));
+                onTap: () async {
+                  try {
+                    final credential =
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: emailController.text,
+                      password: passController.text,
+                    );
+                    if (credential.user != null) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const DonorHome()));
+                    }
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'user-not-found') {
+                      print('No user found for that email.');
+                    } else if (e.code == 'wrong-password') {
+                      print('Wrong password provided for that user.');
+                    }
+                  }
                 },
                 child: Container(
                   padding:

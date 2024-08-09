@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 enum UserType { donor, ngo }
@@ -120,15 +122,43 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 30),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
-                decoration: BoxDecoration(
-                    color: const Color(0xff038C8C),
-                    borderRadius: BorderRadius.circular(30)),
-                child: const Text(
-                  'Register',
-                  style: TextStyle(fontSize: 25, color: Colors.white),
+              GestureDetector(
+                onTap: () async {
+                  try {
+                    UserCredential userCredential = await FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                            email: emailController.text,
+                            password: passController.text);
+                    await Future.delayed(Duration(seconds: 2));
+
+                    await FirebaseFirestore.instance
+                        .collection("user")
+                        .doc(userCredential.user!.uid)
+                        .set({
+                      "email": emailController.text,
+                      "userType": _character.toString()
+                    });
+                    print(userCredential.user!.uid);
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'weak-password') {
+                      print('The password provided is too weak.');
+                    } else if (e.code == 'email-already-in-use') {
+                      print('The account already exists for that email.');
+                    }
+                  } catch (e) {
+                    print(e);
+                  }
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 40, vertical: 5),
+                  decoration: BoxDecoration(
+                      color: const Color(0xff038C8C),
+                      borderRadius: BorderRadius.circular(30)),
+                  child: const Text(
+                    'Register',
+                    style: TextStyle(fontSize: 25, color: Colors.white),
+                  ),
                 ),
               ),
               const SizedBox(height: 20),

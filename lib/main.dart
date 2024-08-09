@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ngo_donor_app/feature/auth/login.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:ngo_donor_app/feature/auth/register.dart';
 import 'package:ngo_donor_app/feature/home/donor_home.dart';
 import 'package:ngo_donor_app/feature/home/ngo_home.dart';
 import 'firebase_options.dart';
@@ -25,6 +26,6 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: NGOHomePage());
+        home: LoginPage());
   }
 }
