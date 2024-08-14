@@ -20,8 +20,12 @@ class NGOHomePage extends StatelessWidget {
                 .map((food) => DonorModel.fromMap(food.data()))
                 .toList();
             print(fooditems.length);
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => Matchedpage()));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Matchedpage(
+                          checkedFoodItems: [],
+                        )));
           },
         ),
         backgroundColor: const Color.fromARGB(255, 0, 0, 0),
@@ -36,7 +40,10 @@ class NGOHomePage extends StatelessWidget {
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2, mainAxisExtent: 300),
                 itemBuilder: (context, index) {
-                  return const IandCfeatures(title: "DAL");
+                  return const IandCfeatures(
+                    title: "DAL",
+                    imageUrl: '',
+                  );
                 },
               ),
             ),

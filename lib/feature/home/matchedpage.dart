@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:ngo_donor_app/feature/home/donor_model.dart';
 
 class Matchedpage extends StatelessWidget {
-  const Matchedpage({super.key});
+  const Matchedpage({super.key, required List<String> checkedFoodItems});
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,11 @@ class Matchedpage extends StatelessWidget {
                   .toList();
               return ListView.builder(
                   itemCount: fooditems.length,
-                  itemBuilder: (context, index) =>
-                      Text(fooditems[index].donorId));
+                  itemBuilder: (context, index) => FutureBuilder(
+                      future: null,
+                      builder: (context, snapshot) {
+                        return Text(fooditems[index].donorId);
+                      }));
             }
             return Text("THERE IS NO DATA");
           }),

@@ -18,6 +18,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
   final passController = TextEditingController();
 
+  final phonecontroller = TextEditingController();
+
+  final addreesscontroller = TextEditingController();
+
   UserType? _character = UserType.donor;
 
   @override
@@ -57,6 +61,27 @@ class _RegisterPageState extends State<RegisterPage> {
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                     hintText: 'Email',
+                    hintStyle: const TextStyle(color: Colors.white60),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20))),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: phonecontroller,
+                keyboardType: TextInputType.phone,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                    hintText: 'Phone number',
+                    hintStyle: const TextStyle(color: Colors.white60),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20))),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: addreesscontroller,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                    hintText: 'Address',
                     hintStyle: const TextStyle(color: Colors.white60),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20))),
@@ -136,7 +161,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         .doc(userCredential.user!.uid)
                         .set({
                       "email": emailController.text,
-                      "userType": _character.toString()
+                      "userType": _character.toString(),
+                      "phone": phonecontroller.text,
+                      "address": addreesscontroller.text,
                     });
                     print(userCredential.user!.uid);
                   } on FirebaseAuthException catch (e) {
