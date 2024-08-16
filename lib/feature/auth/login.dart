@@ -80,7 +80,7 @@ class LoginPage extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const NGOHomePage()));
+                                builder: (context) => const NGOHome()));
                       }
                     }
                   } on FirebaseAuthException catch (e) {
