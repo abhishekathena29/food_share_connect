@@ -68,7 +68,7 @@ class _NGOHomeState extends State<NGOHome> {
         onPressed: () {
           DonorModel data1 = DonorModel(
               donorId: FirebaseAuth.instance.currentUser!.uid,
-              foodName: checkedFoodNGO.join(', '),
+              foodName: checkedFoodNGO.join(','),
               addeddate: Timestamp.fromDate(DateTime.now()));
           adddata(data1);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(

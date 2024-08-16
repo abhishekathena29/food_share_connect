@@ -29,7 +29,7 @@ class _MatchedPageState extends State<MatchedPage> {
 
       for (var doc in donorSnapshot.docs) {
         List<String> donorFoodItems = (doc['foodName'] as String?)
-                ?.split(', ')
+                ?.split(',')
                 .map((item) => item.trim().toUpperCase())
                 .toList() ??
             [];

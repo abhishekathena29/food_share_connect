@@ -66,21 +66,27 @@ class _DonorHomeState extends State<DonorHome> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          DonorModel data1 = DonorModel(
-              donorId: FirebaseAuth.instance.currentUser!.uid,
-              foodName: checkedfood.join(', '),
-              addeddate: Timestamp.fromDate(DateTime.now()));
-          adddata(data1);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                  "Thank you for submitting!An NGO will contact you shortly!")));
-          // Navigate to MatchedPage after data is added
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //       builder: (context) =>
-          //           Matchedpage(checkedFoodItems: checkedfood)),
-          // );
+          if (checkedfood.isNotEmpty) {
+            DonorModel data1 = DonorModel(
+                donorId: FirebaseAuth.instance.currentUser!.uid,
+                foodName: checkedfood.join(','),
+                addeddate: Timestamp.fromDate(DateTime.now()));
+
+            adddata(data1);
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                    "Thank you for submitting!An NGO will contact you shortly!")));
+            // Navigate to MatchedPage after data is added
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) =>
+            //           Matchedpage(checkedFoodItems: checkedfood)),
+            // );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Please select some foodItems")));
+          }
         },
         child: const Icon(Icons.check),
         backgroundColor: Color.fromARGB(
