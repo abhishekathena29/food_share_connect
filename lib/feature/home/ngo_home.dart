@@ -80,6 +80,7 @@ class _NGOHomeState extends State<NGOHome> {
                 builder: (context) =>
                     MatchedPage(checkedFoodItems: checkedFoodNGO)),
           );
+          checkedFoodNGO.clear();
         },
         child: const Icon(Icons.check),
         backgroundColor:
@@ -170,17 +171,16 @@ class _IandCfeaturesNGOState extends State<IandCfeaturesNGO> {
             ),
           ),
           Checkbox(
-            value: isChecked,
+            value: checkedFoodNGO.contains(widget.title),
             onChanged: (bool? value) {
-              setState(() {
-                isChecked = value!;
-                if (isChecked) {
-                  checkedFoodNGO.add(widget.title);
-                } else {
-                  checkedFoodNGO.remove(widget.title);
-                }
-              });
+              if (checkedFoodNGO.contains(widget.title)) {
+                checkedFoodNGO.remove(widget.title);
+              } else {
+                checkedFoodNGO.add(widget.title);
+              }
+              setState(() {});
             },
+
             activeColor: const Color(0xFF028090), // Dark Teal for Checkbox
           ),
         ],

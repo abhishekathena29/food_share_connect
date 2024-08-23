@@ -50,7 +50,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 controller: usernameController,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                    hintText: 'Username',
+                    hintText: 'Enter name',
                     hintStyle: const TextStyle(color: Colors.white60),
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(20))),
@@ -164,6 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       "userType": _character.toString(),
                       "phone": phonecontroller.text,
                       "address": addreesscontroller.text,
+                      "name": usernameController.text,
                     });
                     print(userCredential.user!.uid);
                   } on FirebaseAuthException catch (e) {

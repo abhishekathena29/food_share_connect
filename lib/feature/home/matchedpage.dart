@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'donor_model.dart';
 
 class MatchedPage extends StatefulWidget {
   final List<String> checkedFoodItems;
@@ -22,30 +21,32 @@ class _MatchedPageState extends State<MatchedPage> {
 
   fetchDonors() async {
     try {
+      // Debug: Print the checked food items passed to the page
+      print("Checked Food Items: ${widget.checkedFoodItems}");
+
       QuerySnapshot donorSnapshot =
           await FirebaseFirestore.instance.collection('donorfood').get();
 
       List<Map<String, dynamic>> tempDonors = [];
 
       for (var doc in donorSnapshot.docs) {
+        // Split and trim the donor's food items from the Firestore document
         List<String> donorFoodItems = (doc['foodName'] as String?)
                 ?.split(',')
                 .map((item) => item.trim().toUpperCase())
                 .toList() ??
             [];
 
-        // Debugging output
-        print('Processing donor ID: ${doc['donorId']}');
-        print('Donor Food Items: $donorFoodItems');
-        print(
-            'Checked Food Items: ${widget.checkedFoodItems.map((item) => item.trim().toUpperCase()).toList()}');
+        // Debug: Print the donor's food items
+        print("Donor Food Items: $donorFoodItems");
 
-        // Check if the donor's food items match any of the selected food items
+        // Check if all the checked food items from the NGO are in the donor's food items
         bool matches = widget.checkedFoodItems
             .map((item) => item.trim().toUpperCase())
-            .any((item) => donorFoodItems.contains(item));
+            .every((item) => donorFoodItems.contains(item));
 
-        print('Does it match? $matches');
+        // Debug: Print whether there's a match
+        print("Does it match? $matches");
 
         if (matches) {
           var donorDetails = await FirebaseFirestore.instance
@@ -54,34 +55,23 @@ class _MatchedPageState extends State<MatchedPage> {
               .get();
 
           if (donorDetails.exists) {
-            print('Donor details found for ID: ${doc['donorId']}');
-
             tempDonors.add({
               'email': donorDetails.data()?['email'] ?? 'Unknown Email',
               'phone': donorDetails.data()?['phone'] ?? 'Unknown Phone',
               'address': donorDetails.data()?['address'] ?? 'Unknown Address',
               'userType':
                   donorDetails.data()?['userType'] ?? 'Unknown UserType',
-              // 'collected': collected, // Removed since it doesn't exist and causes issues
             });
-
-            // Debugging output
-            print('Added donor to list: ${donorDetails.data()}');
-          } else {
-            print('No donor details found for ID: ${doc['donorId']}');
           }
         }
       }
 
-      // Final list debugging
-      print('Final matched donors list: $tempDonors');
+      // Debug: Print the final list of matched donors
+      print("Matched Donors: $tempDonors");
 
       setState(() {
         donors = tempDonors;
       });
-
-      // Ensure setState is triggered
-      print('UI should now update with matched donors.');
     } catch (e) {
       print("Error fetching donors: $e");
     }
@@ -101,8 +91,6 @@ class _MatchedPageState extends State<MatchedPage> {
               itemCount: donors.length,
               itemBuilder: (context, index) {
                 var donor = donors[index];
-
-                // Ensure that each field is correctly handled and not null
                 return Container(
                   margin: const EdgeInsets.all(10),
                   padding: const EdgeInsets.all(15),

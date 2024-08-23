@@ -176,17 +176,16 @@ class _IandCfeaturesState extends State<IandCfeatures> {
             ),
           ),
           Checkbox(
-            value: isChecked,
+            value: checkedfood.contains(widget.title),
             onChanged: (bool? value) {
-              setState(() {
-                isChecked = value!;
-                if (isChecked) {
-                  checkedfood.add(widget.title);
-                } else {
-                  checkedfood.remove(widget.title);
-                }
-              });
+              if (checkedfood.contains(widget.title)) {
+                checkedfood.remove(widget.title);
+              } else {
+                checkedfood.add(widget.title);
+              }
+              setState(() {});
             },
+
             activeColor: Color.fromARGB(255, 9, 9, 9), // Coral for Checkbox
           ),
         ],
