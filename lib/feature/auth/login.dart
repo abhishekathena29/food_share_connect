@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ngo_donor_app/feature/auth/register.dart';
 import 'package:ngo_donor_app/feature/home/donor_home.dart';
+import 'package:ngo_donor_app/feature/home/ngo_home.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -51,11 +54,42 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 30),
               GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const DonorHome()));
+                onTap: () async {
+                  print("hello");
+                  try {
+                    final credential =
+                        await FirebaseAuth.instance.signInWithEmailAndPassword(
+                      email: emailController.text,
+                      password: passController.text,
+                    );
+
+                    if (credential.user != null) {
+                      var userdb = await FirebaseFirestore.instance
+                          .collection("user")
+                          .doc(credential.user!.uid)
+                          .get();
+                      var userType = userdb.data()!["userType"];
+
+                      print(userType);
+                      if (userType == "UserType.donor") {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const DonorHome()));
+                      } else {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const NGOHome()));
+                      }
+                    }
+                  } on FirebaseAuthException catch (e) {
+                    if (e.code == 'user-not-found') {
+                      print('No user found for that email.');
+                    } else if (e.code == 'wrong-password') {
+                      print('Wrong password provided for that user.');
+                    }
+                  }
                 },
                 child: Container(
                   padding:
