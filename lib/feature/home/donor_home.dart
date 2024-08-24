@@ -141,7 +141,8 @@ class _IandCfeaturesState extends State<IandCfeatures> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFF56C6C6), // Light Blue for the container
+        color:
+            Color.fromARGB(255, 86, 198, 164), // Light Blue for the container
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
