@@ -8,16 +8,6 @@ List<String> checkedfood = [];
 
 final List<Map<String, String>> foodItems = [
   {
-    "name": "RICE",
-    "imageUrl":
-        "https://media.istockphoto.com/id/153737841/photo/rice.jpg?s=612x612&w=0&k=20&c=lfO7iLT0UsDDzra0uBOsN1rvr2d5OEtrG2uwbts33_c="
-  },
-  {
-    "name": "DAL",
-    "imageUrl":
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/3_types_of_lentil.png/300px-3_types_of_lentil.png"
-  },
-  {
     "name": "WHEAT",
     "imageUrl":
         "https://t3.ftcdn.net/jpg/07/56/66/28/360_F_756662819_M4cJj07c4o4CWRpP07vH41nG3uhuz5jA.jpg"
@@ -26,6 +16,16 @@ final List<Map<String, String>> foodItems = [
     "name": "BEANS",
     "imageUrl":
         "https://media.istockphoto.com/id/157280488/photo/beans-diagonals.jpg?s=612x612&w=0&k=20&c=gY44S58raLHbznpSS1HKIV-QS706oRadEEaQp4i1GJI="
+  },
+  {
+    "name": "RICE",
+    "imageUrl":
+        "https://media.istockphoto.com/id/153737841/photo/rice.jpg?s=612x612&w=0&k=20&c=lfO7iLT0UsDDzra0uBOsN1rvr2d5OEtrG2uwbts33_c="
+  },
+  {
+    "name": "DAL",
+    "imageUrl":
+        "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/3_types_of_lentil.png/300px-3_types_of_lentil.png"
   },
   {
     "name": "OATS",
@@ -101,6 +101,7 @@ class _DonorHomeState extends State<DonorHome> {
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
           itemCount: foodItems.length,
+          addAutomaticKeepAlives: true,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisExtent: 300,
@@ -124,18 +125,18 @@ class IandCfeatures extends StatefulWidget {
     super.key,
     required this.title,
     required this.imageUrl,
+    // required this.changingValue,
   });
 
   final String title;
   final String imageUrl;
+  // final ValueChanged<bool> changingValue;
 
   @override
   State<IandCfeatures> createState() => _IandCfeaturesState();
 }
 
 class _IandCfeaturesState extends State<IandCfeatures> {
-  bool isChecked = false;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -176,16 +177,14 @@ class _IandCfeaturesState extends State<IandCfeatures> {
             ),
           ),
           Checkbox(
-            value: isChecked,
+            value: checkedfood.contains(widget.title),
             onChanged: (bool? value) {
-              setState(() {
-                isChecked = value!;
-                if (isChecked) {
-                  checkedfood.add(widget.title);
-                } else {
-                  checkedfood.remove(widget.title);
-                }
-              });
+              if (checkedfood.contains(widget.title)) {
+                checkedfood.remove(widget.title);
+              } else {
+                checkedfood.add(widget.title);
+              }
+              setState(() {});
             },
             activeColor: Color.fromARGB(255, 9, 9, 9), // Coral for Checkbox
           ),

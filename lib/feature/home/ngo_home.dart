@@ -95,6 +95,7 @@ class _NGOHomeState extends State<NGOHome> {
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
           itemCount: foodItems.length,
+          addAutomaticKeepAlives: true,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             mainAxisExtent: 300,
@@ -128,8 +129,6 @@ class IandCfeaturesNGO extends StatefulWidget {
 }
 
 class _IandCfeaturesNGOState extends State<IandCfeaturesNGO> {
-  bool isChecked = false;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -170,16 +169,14 @@ class _IandCfeaturesNGOState extends State<IandCfeaturesNGO> {
             ),
           ),
           Checkbox(
-            value: isChecked,
+            value: checkedFoodNGO.contains(widget.title),
             onChanged: (bool? value) {
-              setState(() {
-                isChecked = value!;
-                if (isChecked) {
-                  checkedFoodNGO.add(widget.title);
-                } else {
-                  checkedFoodNGO.remove(widget.title);
-                }
-              });
+              if (checkedFoodNGO.contains(widget.title)) {
+                checkedFoodNGO.remove(widget.title);
+              } else {
+                checkedFoodNGO.add(widget.title);
+              }
+              setState(() {});
             },
             activeColor: const Color(0xFF028090), // Dark Teal for Checkbox
           ),
