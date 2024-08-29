@@ -77,7 +77,6 @@ class LoginPage extends StatelessWidget {
                 const SizedBox(height: 30),
                 GestureDetector(
                   onTap: () async {
-                    print("hello");
                     try {
                       final credential = await FirebaseAuth.instance
                           .signInWithEmailAndPassword(
@@ -90,19 +89,30 @@ class LoginPage extends StatelessWidget {
                             .collection("user")
                             .doc(credential.user!.uid)
                             .get();
-                        var userType = userdb.data()!["userType"];
 
-                        print(userType);
-                        if (userType == "UserType.donor") {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const DonorHome()));
+                        if (userdb.exists) {
+                          var userType = userdb.data()!["userType"];
+                          if (userType == "UserType.donor") {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const DonorHome()));
+                          } else {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const NGOHome()));
+                          }
                         } else {
+                          // Handle case where user data does not exist in Firestore
+                          print(
+                              'User data not found. Redirecting to registration.');
                           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const NGOHome()));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    RegisterPage()), // Redirect to registration
+                          );
                         }
                       }
                     } on FirebaseAuthException catch (e) {
@@ -111,6 +121,8 @@ class LoginPage extends StatelessWidget {
                       } else if (e.code == 'wrong-password') {
                         print('Wrong password provided for that user.');
                       }
+                    } catch (e) {
+                      print(e);
                     }
                   },
                   child: Container(
