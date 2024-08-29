@@ -80,7 +80,6 @@ class _NGOHomeState extends State<NGOHome> {
                 builder: (context) =>
                     MatchedPage(checkedFoodItems: checkedFoodNGO)),
           );
-          checkedFoodNGO.clear();
         },
         child: const Icon(Icons.check),
         backgroundColor:
