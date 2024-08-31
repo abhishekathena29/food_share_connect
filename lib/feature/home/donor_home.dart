@@ -75,7 +75,7 @@ class _DonorHomeState extends State<DonorHome> {
             adddata(data1);
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
-                    "Thank you for submitting!An NGO will contact you shortly!")));
+                    "Thank you for submitting! An NGO will contact you shortly!")));
             // Navigate to MatchedPage after data is added
             // Navigator.push(
             //   context,
@@ -85,18 +85,20 @@ class _DonorHomeState extends State<DonorHome> {
             // );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Please select some foodItems")));
+                SnackBar(content: Text("Please select some food items")));
           }
         },
         child: const Icon(Icons.check),
-        backgroundColor: Color.fromARGB(
-            255, 227, 163, 2), // Mint Green for Floating Action Button
+        backgroundColor:
+            Color(0xFF2E3220), // Matching the Login Page theme color
       ),
-      backgroundColor: const Color(0xFFEDF2F4), // Off-White Background
+      backgroundColor: const Color(0xFFF2F2F2), // Off-White Background
       appBar: AppBar(
-          title: const Text("Donor Home Page"),
-          backgroundColor: Color.fromARGB(255, 227, 163, 2) // Slate Grey AppBar
-          ),
+        title: const Text("Donor Home Page"),
+        backgroundColor:
+            Color(0xFF608342), // Matching the Login Page theme color
+        foregroundColor: Colors.white, // Ensure text visibility
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(
@@ -141,8 +143,7 @@ class _IandCfeaturesState extends State<IandCfeatures> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color:
-            Color.fromARGB(255, 86, 198, 164), // Light Blue for the container
+        color: Color(0xFFC6D8C6), // Matching the Login Page theme color
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -173,7 +174,7 @@ class _IandCfeaturesState extends State<IandCfeatures> {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white, // Light-colored text
+              color: Color(0xFF2E3220), // Matching the Login Page theme color
             ),
           ),
           Checkbox(
@@ -186,8 +187,8 @@ class _IandCfeaturesState extends State<IandCfeatures> {
               }
               setState(() {});
             },
-
-            activeColor: Color.fromARGB(255, 9, 9, 9), // Coral for Checkbox
+            activeColor:
+                Color(0xFF608342), // Matching the Login Page theme color
           ),
         ],
       ),

@@ -81,15 +81,20 @@ class _NGOHomeState extends State<NGOHome> {
                     MatchedPage(checkedFoodItems: checkedFoodNGO)),
           );
         },
-        child: const Icon(Icons.check),
+        child: const Icon(
+          Icons.check,
+          color: Colors.white,
+        ),
         backgroundColor:
-            const Color(0xFF00A896), // Teal for Floating Action Button
+            const Color(0xFF2E3220), // Updated to match Login Page theme
       ),
       backgroundColor:
-          const Color(0xFFF0F3BD), // Light Greenish Yellow Background
+          const Color(0xFFF2F2F2), // Updated to match Login Page theme
       appBar: AppBar(
           title: const Text("NGO Home Page"),
-          backgroundColor: const Color(0xFF028090) // Dark Teal AppBar
+          backgroundColor:
+              const Color(0xFF608342), // Updated to match Login Page theme
+          foregroundColor: Colors.white // Ensures text visibility
           ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -135,7 +140,7 @@ class _IandCfeaturesNGOState extends State<IandCfeaturesNGO> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFF99E1D9), // Light Teal for the container
+        color: const Color(0xFFC6D8C6), // Updated to match Login Page theme
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -166,7 +171,7 @@ class _IandCfeaturesNGOState extends State<IandCfeaturesNGO> {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black, // Dark-colored text
+              color: Color(0xFF2E3220), // Updated to match Login Page theme
             ),
           ),
           Checkbox(
@@ -179,8 +184,8 @@ class _IandCfeaturesNGOState extends State<IandCfeaturesNGO> {
               }
               setState(() {});
             },
-
-            activeColor: const Color(0xFF028090), // Dark Teal for Checkbox
+            activeColor:
+                const Color(0xFF608342), // Updated to match Login Page theme
           ),
         ],
       ),

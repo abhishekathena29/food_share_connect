@@ -83,15 +83,18 @@ class _MatchedPageState extends State<MatchedPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Matched Donors'),
-        backgroundColor: const Color(0xFFFF6F61), // Vibrant Coral
+        backgroundColor:
+            const Color(0xFF608342), // Updated to match Login Page theme
         elevation: 4.0,
+        foregroundColor: Colors.white, // Ensures text visibility
       ),
-      backgroundColor: const Color(0xFFFFF8E1), // Light Yellow
+      backgroundColor:
+          const Color(0xFFF2F2F2), // Updated to match Login Page theme
       body: loading
           ? const Center(
               child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(
-                  Color.fromARGB(255, 7, 84, 110)),
+                  Color(0xFF2E3220)), // Updated to match Login Page theme
             ))
           : matchedDetail.isEmpty
               ? const Center(
@@ -111,7 +114,8 @@ class _MatchedPageState extends State<MatchedPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      color: const Color(0xFFFFD700), // Bright Gold
+                      color: const Color(
+                          0xFFC6D8C6), // Updated to match Login Page theme
                       child: Padding(
                         padding: const EdgeInsets.all(15),
                         child: Column(
@@ -122,14 +126,17 @@ class _MatchedPageState extends State<MatchedPage> {
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFF1A237E), // Deep Blue
+                                color: Color(
+                                    0xFF2E3220), // Updated to match Login Page theme
                               ),
                             ),
                             const SizedBox(height: 10),
                             Row(
                               children: [
                                 const Icon(Icons.email,
-                                    color: Color(0xFF1A237E), size: 20),
+                                    color: Color(
+                                        0xFF2E3220), // Updated to match Login Page theme
+                                    size: 20),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
@@ -146,7 +153,9 @@ class _MatchedPageState extends State<MatchedPage> {
                             Row(
                               children: [
                                 const Icon(Icons.phone,
-                                    color: Color(0xFF1A237E), size: 20),
+                                    color: Color(
+                                        0xFF2E3220), // Updated to match Login Page theme
+                                    size: 20),
                                 const SizedBox(width: 10),
                                 Text(
                                   match.phone,
@@ -161,7 +170,9 @@ class _MatchedPageState extends State<MatchedPage> {
                             Row(
                               children: [
                                 const Icon(Icons.location_on,
-                                    color: Color(0xFF1A237E), size: 20),
+                                    color: Color(
+                                        0xFF2E3220), // Updated to match Login Page theme
+                                    size: 20),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Text(
