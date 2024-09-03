@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
 import 'donor_model.dart';
 
 class MatchedPage extends StatefulWidget {
@@ -12,7 +13,8 @@ class MatchedPage extends StatefulWidget {
 }
 
 class _MatchedPageState extends State<MatchedPage> {
-  List<Map<String, dynamic>> donors = [];
+  List<MatchedModel> matchedDetail = [];
+  bool loading = false;
 
   @override
   void initState() {
@@ -21,12 +23,14 @@ class _MatchedPageState extends State<MatchedPage> {
   }
 
   fetchDonors() async {
+    setState(() {
+      loading = true;
+    });
     try {
       QuerySnapshot donorSnapshot =
           await FirebaseFirestore.instance.collection('donorfood').get();
 
-      List<Map<String, dynamic>> tempDonors = [];
-
+      List<MatchedModel> tempMatchedDetail = [];
       for (var doc in donorSnapshot.docs) {
         List<String> donorFoodItems = (doc['foodName'] as String?)
                 ?.split(',')
@@ -34,56 +38,43 @@ class _MatchedPageState extends State<MatchedPage> {
                 .toList() ??
             [];
 
-        // Debugging output
-        print('Processing donor ID: ${doc['donorId']}');
-        print('Donor Food Items: $donorFoodItems');
-        print(
-            'Checked Food Items: ${widget.checkedFoodItems.map((item) => item.trim().toUpperCase()).toList()}');
+        List<String> temp = [];
+        for (var item in widget.checkedFoodItems) {
+          for (var donorItem in donorFoodItems) {
+            if (item.trim().toUpperCase() == donorItem) {
+              temp.add(item);
+            }
+          }
+        }
 
-        // Check if the donor's food items match any of the selected food items
-        bool matches = widget.checkedFoodItems
-            .map((item) => item.trim().toUpperCase())
-            .any((item) => donorFoodItems.contains(item));
-
-        print('Does it match? $matches');
-
-        if (matches) {
+        if (temp.isNotEmpty) {
           var donorDetails = await FirebaseFirestore.instance
               .collection('user')
               .doc(doc['donorId'])
               .get();
-
           if (donorDetails.exists) {
-            print('Donor details found for ID: ${doc['donorId']}');
-
-            tempDonors.add({
-              'email': donorDetails.data()?['email'] ?? 'Unknown Email',
-              'phone': donorDetails.data()?['phone'] ?? 'Unknown Phone',
-              'address': donorDetails.data()?['address'] ?? 'Unknown Address',
-              'userType':
-                  donorDetails.data()?['userType'] ?? 'Unknown UserType',
-              // 'collected': collected, // Removed since it doesn't exist and causes issues
-            });
-
-            // Debugging output
-            print('Added donor to list: ${donorDetails.data()}');
-          } else {
-            print('No donor details found for ID: ${doc['donorId']}');
+            tempMatchedDetail.add(MatchedModel(
+              donorId: doc['donorId'],
+              matchedIttem: temp,
+              email: donorDetails['email'],
+              phone: donorDetails['phone'],
+              address: donorDetails['address'],
+            ));
           }
         }
       }
 
-      // Final list debugging
-      print('Final matched donors list: $tempDonors');
-
       setState(() {
-        donors = tempDonors;
+        matchedDetail = tempMatchedDetail;
+        loading = false;
       });
 
-      // Ensure setState is triggered
       print('UI should now update with matched donors.');
     } catch (e) {
       print("Error fetching donors: $e");
+      setState(() {
+        loading = false;
+      });
     }
   }
 
@@ -92,63 +83,129 @@ class _MatchedPageState extends State<MatchedPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Matched Donors'),
-        backgroundColor: const Color(0xFF028090), // Dark Teal
+        backgroundColor:
+            const Color(0xFF608342), // Updated to match Login Page theme
+        elevation: 4.0,
+        foregroundColor: Colors.white, // Ensures text visibility
       ),
-      backgroundColor: const Color(0xFFF0F3BD), // Light Greenish Yellow
-      body: donors.isEmpty
-          ? const Center(child: Text("No matched donors found"))
-          : ListView.builder(
-              itemCount: donors.length,
-              itemBuilder: (context, index) {
-                var donor = donors[index];
-
-                // Ensure that each field is correctly handled and not null
-                return Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF99E1D9), // Light Teal
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
+      backgroundColor:
+          const Color(0xFFF2F2F2), // Updated to match Login Page theme
+      body: loading
+          ? const Center(
+              child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  Color(0xFF2E3220)), // Updated to match Login Page theme
+            ))
+          : matchedDetail.isEmpty
+              ? const Center(
+                  child: Text(
+                    "No matched donors found",
+                    style: TextStyle(fontSize: 18, color: Colors.black54),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Email: ${donor['email'] ?? 'No Email Provided'}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black, // Dark-colored text
+                )
+              : ListView.builder(
+                  itemCount: matchedDetail.length,
+                  itemBuilder: (context, index) {
+                    var match = matchedDetail[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(
+                          vertical: 10, horizontal: 20),
+                      elevation: 5,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      color: const Color(
+                          0xFFC6D8C6), // Updated to match Login Page theme
+                      child: Padding(
+                        padding: const EdgeInsets.all(15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Matched Items: ${match.matchedIttem.join(', ')}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Color(
+                                    0xFF2E3220), // Updated to match Login Page theme
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Icon(Icons.email,
+                                    color: Color(
+                                        0xFF2E3220), // Updated to match Login Page theme
+                                    size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    match.email,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Icon(Icons.phone,
+                                    color: Color(
+                                        0xFF2E3220), // Updated to match Login Page theme
+                                    size: 20),
+                                const SizedBox(width: 10),
+                                Text(
+                                  match.phone,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on,
+                                    color: Color(
+                                        0xFF2E3220), // Updated to match Login Page theme
+                                    size: 20),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    match.address,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Phone: ${donor['phone'] ?? 'No Phone Provided'}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Address: ${donor['address'] ?? 'No Address Provided'}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'User Type: ${donor['userType'] ?? 'Unknown UserType'}',
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
     );
   }
+}
+
+class MatchedModel {
+  String donorId;
+  List<String> matchedIttem;
+  String email;
+  String phone;
+  String address;
+  MatchedModel({
+    required this.donorId,
+    required this.matchedIttem,
+    required this.email,
+    required this.phone,
+    required this.address,
+  });
 }
