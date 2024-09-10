@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ngo_donor_app/feature/home/donor_model.dart';
-import 'package:ngo_donor_app/feature/home/matchedpage.dart';
+import 'package:food_share_connect/feature/auth/login.dart';
+import 'package:food_share_connect/feature/home/donor_model.dart';
 
 List<String> checkedfood = [];
 
@@ -73,7 +73,7 @@ class _DonorHomeState extends State<DonorHome> {
                 addeddate: Timestamp.fromDate(DateTime.now()));
 
             adddata(data1);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text(
                     "Thank you for submitting! An NGO will contact you shortly!")));
             // Navigate to MatchedPage after data is added
@@ -85,19 +85,34 @@ class _DonorHomeState extends State<DonorHome> {
             // );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text("Please select some food items")));
+                const SnackBar(content: Text("Please select some food items")));
           }
         },
-        child: const Icon(Icons.check),
-        backgroundColor:
-            Color(0xFF2E3220), // Matching the Login Page theme color
+        backgroundColor: const Color(0xFF2E3220),
+        child: const Icon(
+          Icons.check,
+          color: Colors.white,
+        ), // Matching the Login Page theme color
       ),
       backgroundColor: const Color(0xFFF2F2F2), // Off-White Background
       appBar: AppBar(
         title: const Text("Donor Home Page"),
         backgroundColor:
-            Color(0xFF608342), // Matching the Login Page theme color
+            const Color(0xFF608342), // Matching the Login Page theme color
         foregroundColor: Colors.white, // Ensure text visibility
+        actions: [
+          IconButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut().whenComplete(() =>
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
+                      (route) => false));
+            },
+            icon: const Icon(Icons.logout),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -143,7 +158,7 @@ class _IandCfeaturesState extends State<IandCfeatures> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: Color(0xFFC6D8C6), // Matching the Login Page theme color
+        color: const Color(0xFFC6D8C6), // Matching the Login Page theme color
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.3),
@@ -188,7 +203,7 @@ class _IandCfeaturesState extends State<IandCfeatures> {
               setState(() {});
             },
             activeColor:
-                Color(0xFF608342), // Matching the Login Page theme color
+                const Color(0xFF608342), // Matching the Login Page theme color
           ),
         ],
       ),

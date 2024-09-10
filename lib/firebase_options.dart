@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyD6JDhLzZMUiUNXtNRv-9WG4ijJVzNa3rA',
-    appId: '1:858092692119:android:089825de848db3dd973fd2',
+    appId: '1:858092692119:android:dbe14e20a72114de973fd2',
     messagingSenderId: '858092692119',
     projectId: 'foodshareconnect-d9939',
     storageBucket: 'foodshareconnect-d9939.appspot.com',

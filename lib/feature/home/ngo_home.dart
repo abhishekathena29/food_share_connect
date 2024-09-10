@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ngo_donor_app/feature/home/donor_model.dart';
-import 'package:ngo_donor_app/feature/home/matchedpage.dart';
+import 'package:food_share_connect/feature/home/donor_model.dart';
+import 'package:food_share_connect/feature/home/matchedpage.dart';
+
+import '../auth/login.dart';
 
 List<String> checkedFoodNGO = [];
 
@@ -71,7 +73,7 @@ class _NGOHomeState extends State<NGOHome> {
               foodName: checkedFoodNGO.join(','),
               addeddate: Timestamp.fromDate(DateTime.now()));
           adddata(data1);
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               content: Text("Thank you for accepting the donations!")));
           // Navigate to MatchedPage after data is added
           Navigator.push(
@@ -81,21 +83,33 @@ class _NGOHomeState extends State<NGOHome> {
                     MatchedPage(checkedFoodItems: checkedFoodNGO)),
           );
         },
+        backgroundColor: const Color(0xFF2E3220),
         child: const Icon(
           Icons.check,
           color: Colors.white,
-        ),
-        backgroundColor:
-            const Color(0xFF2E3220), // Updated to match Login Page theme
+        ), // Updated to match Login Page theme
       ),
       backgroundColor:
           const Color(0xFFF2F2F2), // Updated to match Login Page theme
       appBar: AppBar(
-          title: const Text("NGO Home Page"),
-          backgroundColor:
-              const Color(0xFF608342), // Updated to match Login Page theme
-          foregroundColor: Colors.white // Ensures text visibility
+        title: const Text("NGO Home Page"),
+        backgroundColor:
+            const Color(0xFF608342), // Updated to match Login Page theme
+        foregroundColor: Colors.white, // Ensures text visibility,
+        actions: [
+          IconButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut().whenComplete(() =>
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()),
+                      (route) => false));
+            },
+            icon: const Icon(Icons.logout),
           ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: GridView.builder(

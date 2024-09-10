@@ -19,14 +19,16 @@ class _RegisterPageState extends State<RegisterPage> {
   final addreesscontroller = TextEditingController();
   UserType? _character = UserType.donor;
 
+  bool _isloading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xff121212), // Dark background
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-          child: SingleChildScrollView(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -54,7 +56,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     hintText: 'Enter name',
                     hintStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: Color(0xff1E1E1E),
+                    fillColor: const Color(0xff1E1E1E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -71,7 +73,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     hintText: 'Email',
                     hintStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: Color(0xff1E1E1E),
+                    fillColor: const Color(0xff1E1E1E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -85,11 +87,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: phonecontroller,
                   keyboardType: TextInputType.phone,
                   style: const TextStyle(color: Colors.white),
+                  maxLength: 10,
                   decoration: InputDecoration(
                     hintText: 'Phone number',
                     hintStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: Color(0xff1E1E1E),
+                    fillColor: const Color(0xff1E1E1E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -124,7 +127,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     hintText: 'Password',
                     hintStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: Color(0xff1E1E1E),
+                    fillColor: const Color(0xff1E1E1E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -136,7 +139,8 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         'Are you a:',
@@ -145,94 +149,117 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       const SizedBox(width: 20),
-                      Expanded(
-                        child: ListTile(
-                          title: const Text(
-                            'Donor',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          leading: Radio<UserType>(
-                            value: UserType.donor,
-                            groupValue: _character,
-                            activeColor: const Color(0xff03DAC5),
-                            onChanged: (UserType? value) {
-                              setState(() {
-                                _character = value;
-                              });
-                            },
-                          ),
+                      ListTile(
+                        title: const Text(
+                          'Donor',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: Radio<UserType>(
+                          value: UserType.donor,
+                          groupValue: _character,
+                          activeColor: const Color(0xff03DAC5),
+                          onChanged: (UserType? value) {
+                            setState(() {
+                              _character = value;
+                            });
+                          },
                         ),
                       ),
-                      Expanded(
-                        child: ListTile(
-                          title: const Text(
-                            'NGO',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          leading: Radio<UserType>(
-                            value: UserType.ngo,
-                            groupValue: _character,
-                            activeColor: const Color(0xff03DAC5),
-                            onChanged: (UserType? value) {
-                              setState(() {
-                                _character = value;
-                              });
-                            },
-                          ),
+                      ListTile(
+                        title: const Text(
+                          'NGO',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        leading: Radio<UserType>(
+                          value: UserType.ngo,
+                          groupValue: _character,
+                          activeColor: const Color(0xff03DAC5),
+                          onChanged: (UserType? value) {
+                            setState(() {
+                              _character = value;
+                            });
+                          },
                         ),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(height: 30),
-                GestureDetector(
-                  onTap: () async {
-                    try {
-                      UserCredential userCredential = await FirebaseAuth
-                          .instance
-                          .createUserWithEmailAndPassword(
-                              email: emailController.text,
-                              password: passController.text);
-                      await Future.delayed(const Duration(seconds: 2));
+                _isloading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ))
+                    : GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            _isloading = true;
+                          });
+                          try {
+                            UserCredential userCredential = await FirebaseAuth
+                                .instance
+                                .createUserWithEmailAndPassword(
+                                    email: emailController.text,
+                                    password: passController.text);
+                            await Future.delayed(const Duration(seconds: 2));
 
-                      await FirebaseFirestore.instance
-                          .collection("user")
-                          .doc(userCredential.user!.uid)
-                          .set({
-                        "email": emailController.text,
-                        "userType": _character.toString(),
-                        "phone": phonecontroller.text,
-                        "address": addreesscontroller.text,
-                        "name": usernameController.text,
-                      });
-                      print(userCredential.user!.uid);
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == 'weak-password') {
-                        print('The password provided is too weak.');
-                      } else if (e.code == 'email-already-in-use') {
-                        print('The account already exists for that email.');
-                      }
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 15),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xff03DAC5), Color(0xff00BFA5)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+                            await FirebaseFirestore.instance
+                                .collection("user")
+                                .doc(userCredential.user!.uid)
+                                .set({
+                              "email": emailController.text,
+                              "userType": _character.toString(),
+                              "phone": phonecontroller.text,
+                              "address": addreesscontroller.text,
+                              "name": usernameController.text,
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        'Registration is Completed. Now you can login.')));
+                            Navigator.pop(context);
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'weak-password') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(e.code)));
+                              print('The password provided is too weak.');
+                            } else if (e.code == 'email-already-in-use') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(e.code)));
+                              print(
+                                  'The account already exists for that email.');
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text("Some Error. Try again later.")));
+                            print(e);
+                          }
+                          setState(() {
+                            _isloading = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 15),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xff03DAC5), Color(0xff00BFA5)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Register',
+                              style: TextStyle(
+                                  fontSize: 20, color: Colors.black87),
+                            ),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Text(
-                      'Register',
-                      style: TextStyle(fontSize: 20, color: Colors.black87),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () => Navigator.pop(context),

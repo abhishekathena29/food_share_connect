@@ -1,15 +1,22 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ngo_donor_app/feature/auth/register.dart';
-import 'package:ngo_donor_app/feature/home/donor_home.dart';
-import 'package:ngo_donor_app/feature/home/ngo_home.dart';
+import 'package:food_share_connect/feature/auth/register.dart';
+import 'package:food_share_connect/feature/home/donor_home.dart';
+import 'package:food_share_connect/feature/home/ngo_home.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passController = TextEditingController();
+
+  bool _isloading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -75,78 +82,105 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 30),
-                GestureDetector(
-                  onTap: () async {
-                    try {
-                      final credential = await FirebaseAuth.instance
-                          .signInWithEmailAndPassword(
-                        email: emailController.text,
-                        password: passController.text,
-                      );
+                _isloading
+                    ? const Center(
+                        child: CircularProgressIndicator(
+                        color: Colors.white,
+                      ))
+                    : GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            _isloading = true;
+                          });
+                          try {
+                            final credential = await FirebaseAuth.instance
+                                .signInWithEmailAndPassword(
+                              email: emailController.text,
+                              password: passController.text,
+                            );
 
-                      if (credential.user != null) {
-                        var userdb = await FirebaseFirestore.instance
-                            .collection("user")
-                            .doc(credential.user!.uid)
-                            .get();
+                            if (credential.user != null) {
+                              var userdb = await FirebaseFirestore.instance
+                                  .collection("user")
+                                  .doc(credential.user!.uid)
+                                  .get();
 
-                        if (userdb.exists) {
-                          var userType = userdb.data()!["userType"];
-                          if (userType == "UserType.donor") {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const DonorHome()));
-                          } else {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const NGOHome()));
+                              if (userdb.exists) {
+                                var userType = userdb.data()!["userType"];
+                                if (userType == "UserType.donor") {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const DonorHome()));
+                                } else {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const NGOHome()));
+                                }
+                              } else {
+                                // Handle case where user data does not exist in Firestore
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'User data not found. Redirecting to registration.')));
+                                print(
+                                    'User data not found. Redirecting to registration.');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const RegisterPage()), // Redirect to registration
+                                );
+                              }
+                            }
+                          } on FirebaseAuthException catch (e) {
+                            if (e.code == 'user-not-found') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(e.code)));
+                              print('No user found for that email.');
+                            } else if (e.code == 'wrong-password') {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(e.code)));
+                              print('Wrong password provided for that user.');
+                            }
+                          } catch (e) {
+                            print(e);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Some Error. Try again later')));
                           }
-                        } else {
-                          // Handle case where user data does not exist in Firestore
-                          print(
-                              'User data not found. Redirecting to registration.');
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    RegisterPage()), // Redirect to registration
-                          );
-                        }
-                      }
-                    } on FirebaseAuthException catch (e) {
-                      if (e.code == 'user-not-found') {
-                        print('No user found for that email.');
-                      } else if (e.code == 'wrong-password') {
-                        print('Wrong password provided for that user.');
-                      }
-                    } catch (e) {
-                      print(e);
-                    }
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 15),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xff03DAC5),
-                          Color(0xff00BFA5)
-                        ], // Gradient for button
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
+
+                          setState(() {
+                            _isloading = false;
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 40, vertical: 15),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xff03DAC5),
+                                Color(0xff00BFA5)
+                              ], // Gradient for button
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Log In',
+                              style: TextStyle(
+                                  fontSize: 20, color: Colors.black87),
+                            ),
+                          ),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'Log In',
-                        style: TextStyle(fontSize: 20, color: Colors.black87),
-                      ),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 20),
                 GestureDetector(
                   onTap: () {
