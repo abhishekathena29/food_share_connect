@@ -88,18 +88,14 @@ class _DonorHomeState extends State<DonorHome> {
                 const SnackBar(content: Text("Please select some food items")));
           }
         },
-        backgroundColor: const Color(0xFF2E3220),
-        child: const Icon(
-          Icons.check,
-          color: Colors.white,
-        ), // Matching the Login Page theme color
+        backgroundColor: const Color(0xff03DAC5),
+        child: const Icon(Icons.check, color: Colors.black87),
       ),
-      backgroundColor: const Color(0xFFF2F2F2), // Off-White Background
+      backgroundColor: const Color(0xff121212), // Off-White Background
       appBar: AppBar(
         title: const Text("Donor Home Page"),
-        backgroundColor:
-            const Color(0xFF608342), // Matching the Login Page theme color
-        foregroundColor: Colors.white, // Ensure text visibility
+        backgroundColor: const Color(0xff03DAC5), // Cyan AppBar
+        foregroundColor: Colors.black87,
         actions: [
           IconButton(
             onPressed: () {
@@ -125,7 +121,7 @@ class _DonorHomeState extends State<DonorHome> {
             mainAxisSpacing: 10,
           ),
           itemBuilder: (context, index) {
-            return IandCfeatures(
+            return FoodCard(
               title: foodItems[index]['name']!,
               imageUrl: foodItems[index]['imageUrl']!,
             );
@@ -136,8 +132,8 @@ class _DonorHomeState extends State<DonorHome> {
   }
 }
 
-class IandCfeatures extends StatefulWidget {
-  const IandCfeatures({
+class FoodCard extends StatefulWidget {
+  const FoodCard({
     super.key,
     required this.title,
     required this.imageUrl,
@@ -147,10 +143,10 @@ class IandCfeatures extends StatefulWidget {
   final String imageUrl;
 
   @override
-  State<IandCfeatures> createState() => _IandCfeaturesState();
+  State<FoodCard> createState() => _FoodCardState();
 }
 
-class _IandCfeaturesState extends State<IandCfeatures> {
+class _FoodCardState extends State<FoodCard> {
   bool isChecked = false;
 
   @override
@@ -158,52 +154,85 @@ class _IandCfeaturesState extends State<IandCfeatures> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFC6D8C6), // Matching the Login Page theme color
+        color: const Color(0xff1E1E1E), // Dark gray background for card
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
+            color: Colors.black.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 10,
             offset: const Offset(0, 3),
           ),
         ],
       ),
       margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
         children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                widget.imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              widget.imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              color:
+                  Colors.black.withOpacity(0.4), // Dark overlay for readability
+              colorBlendMode: BlendMode.darken,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 22, // Larger font size for prominence
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2, // Slightly increased letter spacing
+                      color: Colors.white, // White text for better contrast
+                      shadows: [
+                        Shadow(
+                          offset: Offset(1, 1),
+                          blurRadius: 8,
+                          color: Colors.black45,
+                        )
+                      ], // Subtle shadow for text prominence
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Styled Checkbox
+                  Theme(
+                    data: ThemeData(
+                      unselectedWidgetColor: Colors.white,
+                    ),
+                    child: Transform.scale(
+                      scale: 1.4, // Increase checkbox size
+                      child: Checkbox(
+                        value: checkedfood.contains(widget.title),
+                        onChanged: (bool? value) {
+                          if (!checkedfood.contains(widget.title)) {
+                            checkedfood.add(widget.title);
+                          } else {
+                            checkedfood.remove(widget.title);
+                          }
+                          setState(() {});
+                        },
+                        activeColor:
+                            const Color(0xff03DAC5), // Cyan checkbox color
+                        checkColor: Colors.black, // Black tick for contrast
+                        side: const BorderSide(
+                          color: Colors.white, // White border around checkbox
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            widget.title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2E3220), // Matching the Login Page theme color
-            ),
-          ),
-          Checkbox(
-            value: checkedfood.contains(widget.title),
-            onChanged: (bool? value) {
-              if (checkedfood.contains(widget.title)) {
-                checkedfood.remove(widget.title);
-              } else {
-                checkedfood.add(widget.title);
-              }
-              setState(() {});
-            },
-            activeColor:
-                const Color(0xFF608342), // Matching the Login Page theme color
           ),
         ],
       ),

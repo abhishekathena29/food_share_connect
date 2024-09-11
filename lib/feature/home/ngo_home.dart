@@ -83,19 +83,15 @@ class _NGOHomeState extends State<NGOHome> {
                     MatchedPage(checkedFoodItems: checkedFoodNGO)),
           );
         },
-        backgroundColor: const Color(0xFF2E3220),
-        child: const Icon(
-          Icons.check,
-          color: Colors.white,
-        ), // Updated to match Login Page theme
+        backgroundColor: const Color(0xff03DAC5), // Same cyan theme
+        child: const Icon(Icons.check, color: Colors.black87),
       ),
       backgroundColor:
-          const Color(0xFFF2F2F2), // Updated to match Login Page theme
+          const Color(0xff121212), // Updated to match Login Page theme
       appBar: AppBar(
         title: const Text("NGO Home Page"),
-        backgroundColor:
-            const Color(0xFF608342), // Updated to match Login Page theme
-        foregroundColor: Colors.white, // Ensures text visibility,
+        backgroundColor: const Color(0xff03DAC5), // Cyan AppBar
+        foregroundColor: Colors.black87, // Ensures text visibility,
         actions: [
           IconButton(
             onPressed: () {
@@ -121,7 +117,7 @@ class _NGOHomeState extends State<NGOHome> {
             mainAxisSpacing: 10,
           ),
           itemBuilder: (context, index) {
-            return IandCfeaturesNGO(
+            return FoodCardNGO(
               title: foodItems[index]['name']!,
               imageUrl: foodItems[index]['imageUrl']!,
             );
@@ -132,8 +128,8 @@ class _NGOHomeState extends State<NGOHome> {
   }
 }
 
-class IandCfeaturesNGO extends StatefulWidget {
-  const IandCfeaturesNGO({
+class FoodCardNGO extends StatefulWidget {
+  const FoodCardNGO({
     super.key,
     required this.title,
     required this.imageUrl,
@@ -143,63 +139,94 @@ class IandCfeaturesNGO extends StatefulWidget {
   final String imageUrl;
 
   @override
-  State<IandCfeaturesNGO> createState() => _IandCfeaturesNGOState();
+  State<FoodCardNGO> createState() => _FoodCardNGOState();
 }
 
-class _IandCfeaturesNGOState extends State<IandCfeaturesNGO> {
-  bool isChecked = false;
-
+class _FoodCardNGOState extends State<FoodCardNGO> {
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xFFC6D8C6), // Updated to match Login Page theme
+        color: const Color(0xff1E1E1E), // Dark gray background for card
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 5,
+            color: Colors.black.withOpacity(0.5),
+            spreadRadius: 3,
+            blurRadius: 10,
             offset: const Offset(0, 3),
           ),
         ],
       ),
       margin: const EdgeInsets.all(8),
-      padding: const EdgeInsets.all(8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+      child: Stack(
         children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(15),
-              child: Image.network(
-                widget.imageUrl,
-                fit: BoxFit.cover,
-                width: double.infinity,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              widget.imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+              color:
+                  Colors.black.withOpacity(0.4), // Dark overlay for readability
+              colorBlendMode: BlendMode.darken,
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 20, // Larger font size for prominence
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2, // Slightly increased letter spacing
+                      color: Colors.white, // White text for better contrast
+                      shadows: [
+                        Shadow(
+                          offset: Offset(1, 1),
+                          blurRadius: 8,
+                          color: Colors.black45,
+                        )
+                      ], // Subtle shadow for text prominence
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  // Styled Checkbox
+                  Theme(
+                    data: ThemeData(
+                      unselectedWidgetColor: Colors.white,
+                    ),
+                    child: Transform.scale(
+                      scale: 1.4, // Increase checkbox size
+                      child: Checkbox(
+                        value: checkedFoodNGO.contains(widget.title),
+                        onChanged: (bool? value) {
+                          if (!checkedFoodNGO.contains(widget.title)) {
+                            checkedFoodNGO.add(widget.title);
+                          } else {
+                            checkedFoodNGO.remove(widget.title);
+                          }
+                          setState(() {});
+                        },
+                        activeColor:
+                            const Color(0xff03DAC5), // Cyan checkbox color
+                        checkColor: Colors.black, // Black tick for contrast
+                        side: const BorderSide(
+                          color: Colors.white, // White border around checkbox
+                          width: 2.0,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            widget.title,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF2E3220), // Updated to match Login Page theme
-            ),
-          ),
-          Checkbox(
-            value: checkedFoodNGO.contains(widget.title),
-            onChanged: (bool? value) {
-              if (checkedFoodNGO.contains(widget.title)) {
-                checkedFoodNGO.remove(widget.title);
-              } else {
-                checkedFoodNGO.add(widget.title);
-              }
-              setState(() {});
-            },
-            activeColor:
-                const Color(0xFF608342), // Updated to match Login Page theme
           ),
         ],
       ),
