@@ -1,9 +1,12 @@
+// Copyright 2014 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:food_share_connect/feature/home/donor_model.dart';
 import 'package:food_share_connect/feature/home/matchedpage.dart';
-
+import 'package:food_share_connect/feature/home/ngo_model.dart';
 import '../auth/login.dart';
 
 List<String> checkedFoodNGO = [];
@@ -24,11 +27,7 @@ final List<Map<String, String>> foodItems = [
     "imageUrl":
         "https://t3.ftcdn.net/jpg/07/56/66/28/360_F_756662819_M4cJj07c4o4CWRpP07vH41nG3uhuz5jA.jpg"
   },
-  {
-    "name": "BEANS",
-    "imageUrl":
-        "https://media.istockphoto.com/id/157280488/photo/beans-diagonals.jpg?s=612x612&w=0&k=20&c=gY44S58raLHbznpSS1HKIV-QS706oRadEEaQp4i1GJI="
-  },
+  {"name": "BEANS", "imageUrl": "https://example.com/beans-image.jpg"},
   {
     "name": "OATS",
     "imageUrl":
@@ -59,8 +58,14 @@ class NGOHome extends StatefulWidget {
 }
 
 class _NGOHomeState extends State<NGOHome> {
-  adddata(DonorModel data) async {
-    await FirebaseFirestore.instance.collection('ngofood').add(data.toMap());
+  // Function to add NGO data to Firestore
+  addDataForNGO(NGOModel data) async {
+    try {
+      await FirebaseFirestore.instance.collection('ngofood').add(data.toMap());
+      print("Data added successfully");
+    } catch (e) {
+      print("Failed to add data: \$e");
+    }
   }
 
   @override
@@ -68,20 +73,32 @@ class _NGOHomeState extends State<NGOHome> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          DonorModel data1 = DonorModel(
-              donorId: FirebaseAuth.instance.currentUser!.uid,
+          // Check if there are selected items
+          if (checkedFoodNGO.isNotEmpty) {
+            NGOModel data = NGOModel(
+              ngoId: FirebaseAuth.instance.currentUser!.uid,
               foodName: checkedFoodNGO.join(','),
-              addeddate: Timestamp.fromDate(DateTime.now()));
-          adddata(data1);
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Thank you for accepting the donations!")));
-          // Navigate to MatchedPage after data is added
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    MatchedPage(checkedFoodItems: checkedFoodNGO)),
-          );
+              addeddate: Timestamp.fromDate(DateTime.now()),
+            );
+
+            // Add data to Firestore
+            addDataForNGO(data);
+
+            // Show confirmation message
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text("Thank you for accepting the donations!")));
+
+            // Navigate to MatchedPage after data is added
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      MatchedPage(checkedFoodItems: checkedFoodNGO)),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text("Please select some food items.")));
+          }
         },
         backgroundColor: const Color(0xff03DAC5), // Same cyan theme
         child: const Icon(Icons.check, color: Colors.black87),
@@ -168,9 +185,17 @@ class _FoodCardNGOState extends State<FoodCardNGO> {
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
-              color:
-                  Colors.black.withOpacity(0.4), // Dark overlay for readability
+              color: Colors.black.withOpacity(0.4),
               colorBlendMode: BlendMode.darken,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[800],
+                  child: const Center(
+                    child:
+                        Icon(Icons.broken_image, size: 50, color: Colors.red),
+                  ),
+                );
+              },
             ),
           ),
           Align(
@@ -183,42 +208,41 @@ class _FoodCardNGOState extends State<FoodCardNGO> {
                   Text(
                     widget.title,
                     style: const TextStyle(
-                      fontSize: 20, // Larger font size for prominence
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2, // Slightly increased letter spacing
-                      color: Colors.white, // White text for better contrast
+                      letterSpacing: 1.2,
+                      color: Colors.white,
                       shadows: [
                         Shadow(
                           offset: Offset(1, 1),
                           blurRadius: 8,
                           color: Colors.black45,
                         )
-                      ], // Subtle shadow for text prominence
+                      ],
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // Styled Checkbox
                   Theme(
                     data: ThemeData(
                       unselectedWidgetColor: Colors.white,
                     ),
                     child: Transform.scale(
-                      scale: 1.4, // Increase checkbox size
+                      scale: 1.4,
                       child: Checkbox(
                         value: checkedFoodNGO.contains(widget.title),
                         onChanged: (bool? value) {
-                          if (!checkedFoodNGO.contains(widget.title)) {
-                            checkedFoodNGO.add(widget.title);
-                          } else {
-                            checkedFoodNGO.remove(widget.title);
-                          }
-                          setState(() {});
+                          setState(() {
+                            if (value == true) {
+                              checkedFoodNGO.add(widget.title);
+                            } else {
+                              checkedFoodNGO.remove(widget.title);
+                            }
+                          });
                         },
-                        activeColor:
-                            const Color(0xff03DAC5), // Cyan checkbox color
-                        checkColor: Colors.black, // Black tick for contrast
+                        activeColor: const Color(0xff03DAC5),
+                        checkColor: Colors.black,
                         side: const BorderSide(
-                          color: Colors.white, // White border around checkbox
+                          color: Colors.white,
                           width: 2.0,
                         ),
                       ),

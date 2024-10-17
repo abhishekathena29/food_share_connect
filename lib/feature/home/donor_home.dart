@@ -1,8 +1,13 @@
+// Copyright 2014 The Flutter Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:food_share_connect/feature/auth/login.dart';
 import 'package:food_share_connect/feature/home/donor_model.dart';
+import 'package:food_share_connect/feature/home/matcheddonor.dart'; // Import the new DonorMatchedPage
 
 List<String> checkedfood = [];
 
@@ -58,7 +63,14 @@ class DonorHome extends StatefulWidget {
 
 class _DonorHomeState extends State<DonorHome> {
   adddata(DonorModel data) async {
-    await FirebaseFirestore.instance.collection('donorfood').add(data.toMap());
+    try {
+      await FirebaseFirestore.instance
+          .collection('donorfood')
+          .add(data.toMap());
+      print("Data added successfully");
+    } catch (e) {
+      print("Failed to add data: $e");
+    }
   }
 
   @override
@@ -76,13 +88,15 @@ class _DonorHomeState extends State<DonorHome> {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text(
                     "Thank you for submitting! An NGO will contact you shortly!")));
-            // Navigate to MatchedPage after data is added
-            // Navigator.push(
-            //   context,
-            //   MaterialPageRoute(
-            //       builder: (context) =>
-            //           Matchedpage(checkedFoodItems: checkedfood)),
-            // );
+
+            // Navigate to DonorMatchedPage after data is added
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => MatchedDonorPage(
+                        donorFoodItems: checkedfood,
+                      )),
+            );
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text("Please select some food items")));
@@ -91,10 +105,10 @@ class _DonorHomeState extends State<DonorHome> {
         backgroundColor: const Color(0xff03DAC5),
         child: const Icon(Icons.check, color: Colors.black87),
       ),
-      backgroundColor: const Color(0xff121212), // Off-White Background
+      backgroundColor: const Color(0xff121212),
       appBar: AppBar(
         title: const Text("Donor Home Page"),
-        backgroundColor: const Color(0xff03DAC5), // Cyan AppBar
+        backgroundColor: const Color(0xff03DAC5),
         foregroundColor: Colors.black87,
         actions: [
           IconButton(
@@ -154,7 +168,7 @@ class _FoodCardState extends State<FoodCard> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        color: const Color(0xff1E1E1E), // Dark gray background for card
+        color: const Color(0xff1E1E1E),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.5),
@@ -174,8 +188,7 @@ class _FoodCardState extends State<FoodCard> {
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
-              color:
-                  Colors.black.withOpacity(0.4), // Dark overlay for readability
+              color: Colors.black.withOpacity(0.4),
               colorBlendMode: BlendMode.darken,
             ),
           ),
@@ -189,42 +202,42 @@ class _FoodCardState extends State<FoodCard> {
                   Text(
                     widget.title,
                     style: const TextStyle(
-                      fontSize: 22, // Larger font size for prominence
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2, // Slightly increased letter spacing
-                      color: Colors.white, // White text for better contrast
+                      letterSpacing: 1.2,
+                      color: Colors.white,
                       shadows: [
                         Shadow(
                           offset: Offset(1, 1),
                           blurRadius: 8,
                           color: Colors.black45,
                         )
-                      ], // Subtle shadow for text prominence
+                      ],
                     ),
                   ),
                   const SizedBox(height: 10),
-                  // Styled Checkbox
                   Theme(
                     data: ThemeData(
                       unselectedWidgetColor: Colors.white,
                     ),
                     child: Transform.scale(
-                      scale: 1.4, // Increase checkbox size
+                      scale: 1.4,
                       child: Checkbox(
                         value: checkedfood.contains(widget.title),
                         onChanged: (bool? value) {
-                          if (!checkedfood.contains(widget.title)) {
-                            checkedfood.add(widget.title);
-                          } else {
-                            checkedfood.remove(widget.title);
-                          }
-                          setState(() {});
+                          setState(() {
+                            if (value == true) {
+                              checkedfood.add(widget.title);
+                            } else {
+                              checkedfood.remove(widget.title);
+                            }
+                            isChecked = value ?? false;
+                          });
                         },
-                        activeColor:
-                            const Color(0xff03DAC5), // Cyan checkbox color
-                        checkColor: Colors.black, // Black tick for contrast
+                        activeColor: const Color(0xff03DAC5),
+                        checkColor: Colors.black,
                         side: const BorderSide(
-                          color: Colors.white, // White border around checkbox
+                          color: Colors.white,
                           width: 2.0,
                         ),
                       ),
