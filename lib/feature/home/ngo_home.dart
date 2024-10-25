@@ -1,7 +1,3 @@
-// Copyright 2014 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -58,13 +54,12 @@ class NGOHome extends StatefulWidget {
 }
 
 class _NGOHomeState extends State<NGOHome> {
-  // Function to add NGO data to Firestore
-  addDataForNGO(NGOModel data) async {
+  Future<void> addDataForNGO(NGOModel data) async {
     try {
       await FirebaseFirestore.instance.collection('ngofood').add(data.toMap());
-      print("Data added successfully");
+      print("Data added successfully with ngoId");
     } catch (e) {
-      print("Failed to add data: \$e");
+      print("Failed to add data: $e");
     }
   }
 
@@ -75,26 +70,32 @@ class _NGOHomeState extends State<NGOHome> {
         onPressed: () {
           // Check if there are selected items
           if (checkedFoodNGO.isNotEmpty) {
-            NGOModel data = NGOModel(
-              ngoId: FirebaseAuth.instance.currentUser!.uid,
-              foodName: checkedFoodNGO.join(','),
-              addeddate: Timestamp.fromDate(DateTime.now()),
-            );
+            final user = FirebaseAuth.instance.currentUser;
+            if (user != null) {
+              NGOModel data = NGOModel(
+                ngoId: user.uid,
+                foodName: checkedFoodNGO.join(','),
+                addeddate: Timestamp.fromDate(DateTime.now()),
+              );
 
-            // Add data to Firestore
-            addDataForNGO(data);
+              // Add data to Firestore
+              addDataForNGO(data);
 
-            // Show confirmation message
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Thank you for accepting the donations!")));
+              // Show confirmation message
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Thank you for accepting the donations!")));
 
-            // Navigate to MatchedPage after data is added
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      MatchedPage(checkedFoodItems: checkedFoodNGO)),
-            );
+              // Navigate to MatchedPage after data is added
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        MatchedPage(checkedFoodItems: checkedFoodNGO)),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("User is not authenticated.")));
+            }
           } else {
             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                 content: Text("Please select some food items.")));

@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class NGOModel {
-  String ngoId;
-  String foodName;
-  Timestamp addeddate;
+  final String ngoId; // Changed to ngoId for consistency
+  final String foodName;
+  final Timestamp addeddate;
 
   NGOModel({
     required this.ngoId,
