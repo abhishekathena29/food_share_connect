@@ -1,56 +1,54 @@
-// Copyright 2014 The Flutter Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:food_share_connect/feature/auth/login.dart';
 import 'package:food_share_connect/feature/home/donor_model.dart';
-import 'package:food_share_connect/feature/home/matcheddonor.dart'; // Import the new DonorMatchedPage
+import 'package:food_share_connect/feature/home/matcheddonor.dart';
 
-List<String> checkedfood = [];
+Map<String, Map<String, dynamic>> checkedfoodMap = {}; // Persistent map
+
+// Updated to include quantity and unit
 
 final List<Map<String, String>> foodItems = [
   {
     "name": "RICE",
     "imageUrl":
-        "https://media.istockphoto.com/id/153737841/photo/rice.jpg?s=612x612&w=0&k=20&c=lfO7iLT0UsDDzra0uBOsN1rvr2d5OEtrG2uwbts33_c="
+        "https://static.vecteezy.com/system/resources/previews/041/051/304/non_2x/rice-in-bag-with-ears-of-grain-basmati-harvest-national-asian-dish-vector.jpg"
   },
   {
-    "name": "DAL",
+    "name": "PULSES",
     "imageUrl":
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/3_types_of_lentil.png/300px-3_types_of_lentil.png"
+        "https://static.vecteezy.com/system/resources/thumbnails/048/917/545/small_2x/beans-and-beans-in-a-bowl-vector.jpg"
   },
   {
     "name": "WHEAT",
     "imageUrl":
-        "https://t3.ftcdn.net/jpg/07/56/66/28/360_F_756662819_M4cJj07c4o4CWRpP07vH41nG3uhuz5jA.jpg"
+        "https://static.vecteezy.com/system/resources/previews/047/311/467/non_2x/wheat-crop-cartoon-graphic-free-png.png"
   },
   {
-    "name": "BEANS",
+    "name": "SNACKS",
     "imageUrl":
-        "https://media.istockphoto.com/id/157280488/photo/beans-diagonals.jpg?s=612x612&w=0&k=20&c=gY44S58raLHbznpSS1HKIV-QS706oRadEEaQp4i1GJI="
+        "https://www.shutterstock.com/image-vector/potato-chips-package-bag-sticker-600nw-2331155791.jpg"
   },
   {
-    "name": "OATS",
+    "name": "CANNED FOOD",
     "imageUrl":
-        "https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcQk7xl1AQDWi1caZ-vEBLPfKTPuSHE_HGV1wNum6wlFuajYjwfc"
+        "https://t4.ftcdn.net/jpg/01/90/91/99/360_F_190919999_MewBbMjoyAeJbEXxE3ioafIzCqUGboLo.jpg"
   },
   {
     "name": "FRUITS",
     "imageUrl":
-        "https://t4.ftcdn.net/jpg/00/65/70/65/360_F_65706597_uNm2SwlPIuNUDuMwo6stBd81e25Y8K8s.jpg"
+        "https://png.pngtree.com/png-clipart/20201223/ourmid/pngtree-fruit-combination-illustration-illustration-png-image_2604329.jpg"
   },
   {
     "name": "VEGETABLES",
     "imageUrl":
-        "https://t3.ftcdn.net/jpg/03/98/61/96/360_F_398619615_g8iqFtDWH5gsKjE16H6iNQ6h8BhywuFS.jpg"
+        "https://thumbs.dreamstime.com/b/colorful-cartoon-vegetables-illustration-healthy-eating-nutrition-vector-shows-338397591.jpg"
   },
   {
     "name": "SUGAR",
     "imageUrl":
-        "https://t3.ftcdn.net/jpg/02/22/41/82/360_F_222418209_hfwPSMzDi7pZWmCTn9NGdCJ3sijCGuQo.jpg"
+        "https://t3.ftcdn.net/jpg/04/14/63/68/360_F_414636826_vRTX4F3xS16nzRwll8OYpLHtG17Vrohc.jpg"
   },
 ];
 
@@ -62,86 +60,218 @@ class DonorHome extends StatefulWidget {
 }
 
 class _DonorHomeState extends State<DonorHome> {
+  String currentTab = "FOOD";
+
   adddata(DonorModel data) async {
     try {
       await FirebaseFirestore.instance
           .collection('donorfood')
           .add(data.toMap());
+
       print("Data added successfully");
     } catch (e) {
       print("Failed to add data: $e");
     }
   }
 
+  List<Map<String, String>> getDisplayedItems() {
+    switch (currentTab) {
+      case "CLOTHING":
+        return [
+          {
+            "name": "CLOTHING",
+            "imageUrl":
+                "https://media.istockphoto.com/id/1283154274/photo/woman-holding-cardboard-donation-box-full-with-folded-clothes.jpg?s=612x612&w=0&k=20&c=bqJFhv_hRXV3Milqrmuh54eyIiScjgqP6z0iwnnT84I="
+          },
+          {
+            "name": "BLANCKETS/SCARVES",
+            "imageUrl":
+                "https://media.istockphoto.com/id/1388313478/photo/close-up-of-woman-preparing-box-of-clothing-for-charity.jpg?s=612x612&w=0&k=20&c=Q2p2gwaisW3jBJDgpgDPlehAT_HFCN6datyJtSWYDdA="
+          },
+          {
+            "name": "GLOVES",
+            "imageUrl":
+                "https://media.istockphoto.com/id/481044365/photo/warm-woolen-knitted-gloves.jpg?s=612x612&w=0&k=20&c=boqQOwOmlBGuwvVujKKeN022Zp1GAcyZLiiB-Z5LX5Q="
+          },
+          {
+            "name": "HAT",
+            "imageUrl":
+                "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvEd6Z5K0paqS-ATqtzYPLlZ3oiNyuLkSovQ&s"
+          },
+          {
+            "name": "SOCKS",
+            "imageUrl":
+                "https://m.media-amazon.com/images/I/5170dK9d6cL._AC_UY1100_.jpg"
+          },
+        ];
+      case "ESSENTIALS":
+        return [
+          {
+            "name": "SOAP",
+            "imageUrl":
+                "https://media.istockphoto.com/id/964808824/vector/soap-flat-icon-soap-bubbles-vector-illustration.jpg?s=612x612&w=0&k=20&c=iGZSLnmm2KZVL349BMz0HdVsPwE6_GqJUGKDTjJXEds="
+          },
+          {
+            "name": "SHAMPOO",
+            "imageUrl":
+                "https://as1.ftcdn.net/v2/jpg/04/61/58/50/1000_F_461585096_ubs4jj8neihfsTZNLcnNTLrvQoQ8iyju.jpg"
+          },
+          {
+            "name": "TOOTHPASTE",
+            "imageUrl":
+                "https://t4.ftcdn.net/jpg/01/70/61/27/360_F_170612790_PZdBIX7NfHvZC6RO1EaAxyKWLf7lEMlU.jpg"
+          },
+          {
+            "name": "TOILET PAPER",
+            "imageUrl":
+                "https://static.vecteezy.com/system/resources/previews/002/383/145/non_2x/cartoon-illustration-of-toilet-paper-free-vector.jpg"
+          },
+          {
+            "name": "HAND SANITIZER",
+            "imageUrl":
+                "https://static.vecteezy.com/system/resources/previews/006/921/737/non_2x/washing-hand-with-hand-sanitizer-cartoon-icon-illustration-people-medical-icon-concept-isolated-premium-flat-cartoon-style-vector.jpg"
+          },
+          {
+            "name": "DETERGENT",
+            "imageUrl":
+                "https://cdn-icons-png.flaticon.com/512/9619/9619872.png"
+          },
+          {
+            "name": "TOWEL",
+            "imageUrl":
+                "https://www.shutterstock.com/image-vector/vector-illustration-blue-towels-terry-600nw-496523932.jpg"
+          },
+          {
+            "name": "FIRST AID KIT ITEMS",
+            "imageUrl":
+                "https://cdn-icons-png.flaticon.com/512/12322/12322000.png"
+          },
+        ];
+      default:
+        return foodItems;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          if (checkedfood.isNotEmpty) {
-            DonorModel data1 = DonorModel(
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            if (checkedfoodMap.isNotEmpty) {
+              // Convert map to list for saving
+              List<Map<String, dynamic>> finalCheckedFood =
+                  checkedfoodMap.values.toList();
+
+              // Format for saving
+              String foodDetails = finalCheckedFood.map((item) {
+                return "${item['name']} (${item['quantity']} ${item['unit']})";
+              }).join(', ');
+
+              DonorModel data1 = DonorModel(
                 donorId: FirebaseAuth.instance.currentUser!.uid,
-                foodName: checkedfood.join(','),
-                addeddate: Timestamp.fromDate(DateTime.now()));
+                foodName: foodDetails,
+                addeddate: Timestamp.fromDate(DateTime.now()),
+              );
 
-            adddata(data1);
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text(
-                    "Thank you for submitting! An NGO will contact you shortly!")));
+              var result = await FirebaseFirestore.instance
+                  .collection("donorfood")
+                  .where("donorId",
+                      isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+                  .get();
+              if (result.docs.isNotEmpty && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content:
+                        Text("You can make only one request at a time! ")));
+              } else {
+                adddata(data1);
 
-            // Navigate to DonorMatchedPage after data is added
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => MatchedDonorPage(
-                        donorFoodItems: checkedfood,
-                      )),
-            );
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text("Please select some food items")));
-          }
-        },
-        backgroundColor: const Color(0xff03DAC5),
-        child: const Icon(Icons.check, color: Colors.black87),
-      ),
-      backgroundColor: const Color(0xff121212),
-      appBar: AppBar(
-        title: const Text("Donor Home Page"),
-        backgroundColor: const Color(0xff03DAC5),
-        foregroundColor: Colors.black87,
-        actions: [
-          IconButton(
-            onPressed: () {
-              FirebaseAuth.instance.signOut().whenComplete(() =>
-                  Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const LoginPage()),
-                      (route) => false));
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: GridView.builder(
-          itemCount: foodItems.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisExtent: 300,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemBuilder: (context, index) {
-            return FoodCard(
-              title: foodItems[index]['name']!,
-              imageUrl: foodItems[index]['imageUrl']!,
-            );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text(
+                          "Thank you for submitting! An NGO will contact you shortly!")));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MatchedDonorPage(
+                        donorFoodItems: finalCheckedFood.map((item) {
+                          return "${item['name']} (${item['quantity']} ${item['unit']})";
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                }
+              }
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Please select some items")));
+            }
           },
+          backgroundColor: const Color(0xff03DAC5),
+          child: const Icon(Icons.check, color: Colors.black87),
+        ),
+        appBar: AppBar(
+          title: const Text("Donor Home Page"),
+          backgroundColor: const Color(0xff03DAC5),
+          foregroundColor: Colors.black87,
+          actions: [
+            IconButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut().whenComplete(() =>
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LoginPage()),
+                        (route) => false));
+              },
+              icon: const Icon(Icons.logout, color: Colors.black),
+            ),
+          ],
+          bottom: TabBar(
+            onTap: (index) {
+              setState(() {
+                currentTab = index == 0
+                    ? "FOOD"
+                    : index == 1
+                        ? "CLOTHING"
+                        : "ESSENTIALS";
+              });
+            },
+            tabs: const [
+              Tab(text: "FOOD"),
+              Tab(text: "CLOTHING"),
+              Tab(text: "ESSENTIALS"),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            buildGrid(getDisplayedItems()),
+            buildGrid(getDisplayedItems()),
+            buildGrid(getDisplayedItems()),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget buildGrid(List<Map<String, String>> items) {
+    return GridView.builder(
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisExtent: 300,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemBuilder: (context, index) {
+        return FoodCard(
+          title: items[index]['name']!,
+          imageUrl: items[index]['imageUrl']!,
+          currentTab: currentTab,
+        );
+      },
     );
   }
 }
@@ -151,16 +281,19 @@ class FoodCard extends StatefulWidget {
     super.key,
     required this.title,
     required this.imageUrl,
+    required this.currentTab,
   });
 
   final String title;
   final String imageUrl;
+  final String currentTab;
 
   @override
   State<FoodCard> createState() => _FoodCardState();
 }
 
 class _FoodCardState extends State<FoodCard> {
+  int quantity = 1;
   bool isChecked = false;
 
   @override
@@ -171,81 +304,102 @@ class _FoodCardState extends State<FoodCard> {
         color: const Color(0xff1E1E1E),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.5),
-            spreadRadius: 3,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: Colors.black.withOpacity(0.4),
+            spreadRadius: 2,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
       margin: const EdgeInsets.all(8),
-      child: Stack(
+      child: Column(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: Image.network(
               widget.imageUrl,
               fit: BoxFit.cover,
+              height: 150,
               width: double.infinity,
-              height: double.infinity,
-              color: Colors.black.withOpacity(0.4),
+              color: Colors.black.withOpacity(0.3),
               colorBlendMode: BlendMode.darken,
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    widget.title,
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                      color: Colors.white,
-                      shadows: [
-                        Shadow(
-                          offset: Offset(1, 1),
-                          blurRadius: 8,
-                          color: Colors.black45,
-                        )
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Theme(
-                    data: ThemeData(
-                      unselectedWidgetColor: Colors.white,
-                    ),
-                    child: Transform.scale(
-                      scale: 1.4,
-                      child: Checkbox(
-                        value: checkedfood.contains(widget.title),
-                        onChanged: (bool? value) {
-                          setState(() {
-                            if (value == true) {
-                              checkedfood.add(widget.title);
-                            } else {
-                              checkedfood.remove(widget.title);
-                            }
-                            isChecked = value ?? false;
-                          });
-                        },
-                        activeColor: const Color(0xff03DAC5),
-                        checkColor: Colors.black,
-                        side: const BorderSide(
-                          color: Colors.white,
-                          width: 2.0,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+          const SizedBox(height: 10),
+          Text(
+            widget.title,
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Color(0xffF7D18E),
             ),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                onPressed: () {
+                  setState(() {
+                    quantity++;
+                    if (checkedfoodMap[widget.title] != null) {
+                      checkedfoodMap[widget.title]!['quantity'] = quantity;
+                    }
+                  });
+                },
+              ),
+              IconButton(
+                icon: const Icon(Icons.remove, color: Colors.white),
+                onPressed: quantity > 1
+                    ? () {
+                        setState(() {
+                          quantity--;
+                          if (checkedfoodMap[widget.title] != null) {
+                            checkedfoodMap[widget.title]!['quantity'] =
+                                quantity;
+                          }
+                        });
+                      }
+                    : null,
+              ),
+              Text(
+                "$quantity ${widget.currentTab == "FOOD" ? "kg" : "pcs"}",
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              ),
+              IconButton(
+                icon: const Icon(Icons.add, color: Colors.white),
+                onPressed: () {
+                  setState(() {
+                    quantity++;
+                  });
+                },
+              ),
+            ],
+          ),
+          CheckboxListTile(
+            title: const Text(
+              "Select",
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            value: checkedfoodMap[widget.title] !=
+                null, // Check if the item is in the map
+            onChanged: (value) {
+              setState(() {
+                if (value == true) {
+                  // Add to map
+                  checkedfoodMap[widget.title] = {
+                    'name': widget.title,
+                    'quantity': quantity,
+                    'unit': widget.currentTab == "FOOD" ? "kg" : "pcs",
+                  };
+                } else {
+                  // Remove from map
+                  checkedfoodMap.remove(widget.title);
+                }
+              });
+            },
+            activeColor: const Color(0xff03DAC5),
           ),
         ],
       ),
