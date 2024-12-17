@@ -28,46 +28,78 @@ class _MatchedPageState extends State<MatchedPage> {
       QuerySnapshot donorSnapshot =
           await FirebaseFirestore.instance.collection('donorfood').get();
 
-      List<MatchedModel> tempMatchedDetail = [];
+      Map<String, MatchedModel> donorMap = {}; // Group contributions by donorId
+
       for (var doc in donorSnapshot.docs) {
+        String donorId = doc['donorId'];
+
+        // Parse donor's food items
         List<String> donorFoodItems = (doc['foodName'] as String?)
                 ?.split(',')
-                .map((item) => item.trim().toUpperCase())
+                .map((item) => item.trim())
                 .toList() ??
             [];
 
-        List<String> temp = [];
-        for (var item in widget.checkedFoodItems) {
-          for (var donorItem in donorFoodItems) {
-            if (item.trim().toUpperCase() == donorItem) {
-              temp.add(item);
-            }
+        // Aggregate donor contributions
+        Map<String, int> aggregatedDonorItems = {};
+        for (var item in donorFoodItems) {
+          String itemName = item.split('(')[0].trim();
+          int quantity = int.tryParse(
+                  item.split('(')[1].split(' ')[0].replaceAll(')', '')) ??
+              0;
+
+          aggregatedDonorItems[itemName] =
+              (aggregatedDonorItems[itemName] ?? 0) + quantity;
+        }
+
+        // Match donor contributions with NGO's request
+        Map<String, String> matchedItems = {};
+        for (var ngoItem in widget.checkedFoodItems) {
+          String ngoItemName = ngoItem.split('(')[0].trim();
+          int ngoQuantity = int.tryParse(
+                  ngoItem.split('(')[1].split(' ')[0].replaceAll(')', '')) ??
+              0;
+
+          if (aggregatedDonorItems.containsKey(ngoItemName)) {
+            int donorQuantity = aggregatedDonorItems[ngoItemName]!;
+
+            // Determine the fulfilled quantity
+            int fulfilledQuantity =
+                donorQuantity > ngoQuantity ? ngoQuantity : donorQuantity;
+
+            matchedItems[ngoItemName] =
+                "$fulfilledQuantity of $ngoQuantity kg/pcs";
           }
         }
 
-        if (temp.isNotEmpty) {
+        if (matchedItems.isNotEmpty) {
           var donorDetails = await FirebaseFirestore.instance
               .collection('user')
-              .doc(doc['donorId'])
+              .doc(donorId)
               .get();
+
           if (donorDetails.exists) {
-            tempMatchedDetail.add(MatchedModel(
-              donorId: doc['donorId'],
-              matchedIttem: temp,
-              email: donorDetails['email'],
-              phone: donorDetails['phone'],
-              address: donorDetails['address'],
-            ));
+            if (donorMap.containsKey(donorId)) {
+              donorMap[donorId]!.matchedIttem.addAll(matchedItems);
+            } else {
+              donorMap[donorId] = MatchedModel(
+                donorId: donorId,
+                matchedIttem: matchedItems,
+                email: donorDetails['email'],
+                phone: donorDetails['phone'],
+                address: donorDetails['address'],
+              );
+            }
           }
         }
       }
 
       setState(() {
-        matchedDetail = tempMatchedDetail;
+        matchedDetail = donorMap.values.toList(); // Convert map to list
         loading = false;
       });
 
-      print('UI should now update with matched donors.');
+      print('UI updated with matched donors and quantities.');
     } catch (e) {
       print("Error fetching donors: $e");
       setState(() {
@@ -80,108 +112,186 @@ class _MatchedPageState extends State<MatchedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Matched Donors'),
-        backgroundColor: const Color(0xff03DAC5), // Cyan color for AppBar
-        foregroundColor: Colors.black87, // Ensure text is visible
+        title: const Text(
+          'Matched Donors',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: const Color(0xff2A9D8F), // Teal for elegance
+        foregroundColor: Colors.white,
+        elevation: 5,
       ),
-      backgroundColor: const Color(0xff121212), // Dark background
+      backgroundColor: const Color(0xffF4F4F4), // Light gray background
       body: loading
           ? const Center(
               child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(
-                  Color(0xff03DAC5)), // Cyan progress indicator
-            ))
+                valueColor: AlwaysStoppedAnimation<Color>(
+                    Color(0xff2A9D8F)), // Matching teal color
+              ),
+            )
           : matchedDetail.isEmpty
               ? const Center(
                   child: Text(
                     "No matched donors found",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff555555)), // Subtle dark gray text
                   ),
                 )
-              : ListView.builder(
-                  itemCount: matchedDetail.length,
-                  itemBuilder: (context, index) {
-                    var match = matchedDetail[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 20),
-                      elevation: 5,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
+              : Column(
+                  children: [
+                    // Display NGO's request at the top
+                    Container(
+                      margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff264653),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      color: const Color(
-                          0xff1E1E1E), // Dark gray background for card
-                      child: Padding(
-                        padding: const EdgeInsets.all(15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Matched Items: ${match.matchedIttem.join(', ')}",
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white, // White text for contrast
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "NGO's Request:",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            widget.checkedFoodItems.join(', '),
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // Matched Donors List
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: matchedDetail.length,
+                        itemBuilder: (context, index) {
+                          var match = matchedDetail[index];
+
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            elevation: 8,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xff264653),
+                                    Color(0xff2A9D8F)
+                                  ], // Classy teal gradient
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(15),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Matched Donor",
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+
+                                    // Matched Items with Fulfilled Quantities
+                                    const Text(
+                                      "Matched Items:",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    ...match.matchedIttem.entries.map((entry) {
+                                      return Text(
+                                        "- ${entry.key}: ${entry.value}",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.white70,
+                                        ),
+                                      );
+                                    }).toList(),
+
+                                    const SizedBox(height: 10),
+
+                                    // Donor Details
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.email,
+                                            color: Colors.white70, size: 20),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            match.email,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.phone,
+                                            color: Colors.white70, size: 20),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          match.phone,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.location_on,
+                                            color: Colors.white70, size: 20),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Text(
+                                            match.address,
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.white70,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                const Icon(Icons.email,
-                                    color: Color(0xff03DAC5), // Cyan icon color
-                                    size: 20),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    match.email,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors
-                                          .white70, // Slightly lighter text
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                const Icon(Icons.phone,
-                                    color: Color(0xff03DAC5), // Cyan icon color
-                                    size: 20),
-                                const SizedBox(width: 10),
-                                Text(
-                                  match.phone,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on,
-                                    color: Color(0xff03DAC5), // Cyan icon color
-                                    size: 20),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: Text(
-                                    match.address,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
     );
   }
@@ -189,7 +299,7 @@ class _MatchedPageState extends State<MatchedPage> {
 
 class MatchedModel {
   String donorId;
-  List<String> matchedIttem;
+  Map<String, String> matchedIttem;
   String email;
   String phone;
   String address;
