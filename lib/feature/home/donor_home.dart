@@ -229,6 +229,7 @@ class _DonorHomeState extends State<DonorHome> {
             ),
           ],
           bottom: TabBar(
+            // isScrollable: false,
             onTap: (index) {
               setState(() {
                 currentTab = index == 0
@@ -246,6 +247,7 @@ class _DonorHomeState extends State<DonorHome> {
           ),
         ),
         body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           children: [
             buildGrid(getDisplayedItems()),
             buildGrid(getDisplayedItems()),
@@ -338,17 +340,17 @@ class _FoodCardState extends State<FoodCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  setState(() {
-                    quantity++;
-                    if (checkedfoodMap[widget.title] != null) {
-                      checkedfoodMap[widget.title]!['quantity'] = quantity;
-                    }
-                  });
-                },
-              ),
+              // IconButton(
+              //   icon: const Icon(Icons.add, color: Colors.white),
+              //   onPressed: () {
+              //     setState(() {
+              //       quantity++;
+              //       if (checkedfoodMap[widget.title] != null) {
+              //         checkedfoodMap[widget.title]!['quantity'] = quantity;
+              //       }
+              //     });
+              //   },
+              // ),
               IconButton(
                 icon: const Icon(Icons.remove, color: Colors.white),
                 onPressed: quantity > 1

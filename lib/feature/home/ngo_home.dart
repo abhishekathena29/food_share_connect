@@ -231,6 +231,7 @@ class _NGOHomeState extends State<NGOHome> {
           ),
         ),
         body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),
           children: [
             buildGrid(getDisplayedItems()),
             buildGrid(getDisplayedItems()),
