@@ -32,6 +32,7 @@ class _MatchedPageState extends State<MatchedPage> {
 
       for (var doc in donorSnapshot.docs) {
         String donorId = doc['donorId'];
+        String isfulfilled = doc['isfulfilled'];
 
         // Parse donor's food items
         List<String> donorFoodItems = (doc['foodName'] as String?)

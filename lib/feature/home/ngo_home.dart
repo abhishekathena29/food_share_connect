@@ -6,6 +6,7 @@ import '../auth/login.dart';
 import 'ngo_model.dart';
 
 List<Map<String, dynamic>> checkedFoodNGO = []; // Updated to include quantity
+int quantity = 0;
 
 final List<Map<String, String>> foodItems = [
   {
@@ -277,7 +278,6 @@ class FoodCardNGO extends StatefulWidget {
 }
 
 class _FoodCardNGOState extends State<FoodCardNGO> {
-  int quantity = 1;
   bool isChecked = false;
 
   @override
