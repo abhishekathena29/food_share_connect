@@ -40,11 +40,17 @@ class MyApp extends StatelessWidget {
                     .doc(snapshot.data!.uid)
                     .snapshots(),
                 builder: (context, storeSnapshot) {
-                  if (storeSnapshot.hasData && storeSnapshot.data != null) {
-                    if (storeSnapshot.data!['userType'] == "UserType.ngo") {
+                  if (storeSnapshot.hasData &&
+                      storeSnapshot.data != null &&
+                      storeSnapshot.data!.data() != null) {
+                    if (storeSnapshot.data!.data()!['userType'] ==
+                        "UserType.ngo") {
                       return const NGOHome();
-                    } else {
+                    } else if (storeSnapshot.data!.data()!['userType'] ==
+                        "UserType.donor") {
                       return const DonorHome();
+                    } else {
+                      return const LoginPage();
                     }
                   } else {
                     return const Scaffold(

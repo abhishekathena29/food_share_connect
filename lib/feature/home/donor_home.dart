@@ -263,7 +263,7 @@ class _DonorHomeState extends State<DonorHome> {
       itemCount: items.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisExtent: 300,
+        mainAxisExtent: 360,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
@@ -320,6 +320,13 @@ class _FoodCardState extends State<FoodCard> {
             borderRadius: BorderRadius.circular(20),
             child: Image.network(
               widget.imageUrl,
+              errorBuilder: (context, error, stackTrace) => const SizedBox(
+                height: 150,
+                child: Icon(
+                  Icons.image,
+                  color: Colors.white,
+                ),
+              ),
               fit: BoxFit.cover,
               height: 150,
               width: double.infinity,
@@ -330,6 +337,7 @@ class _FoodCardState extends State<FoodCard> {
           const SizedBox(height: 10),
           Text(
             widget.title,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

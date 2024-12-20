@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -89,9 +91,11 @@ class _LoginPageState extends State<LoginPage> {
                       ))
                     : GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            _isloading = true;
-                          });
+                          if (mounted) {
+                            setState(() {
+                              _isloading = true;
+                            });
+                          }
                           try {
                             final credential = await FirebaseAuth.instance
                                 .signInWithEmailAndPassword(
@@ -105,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
                                   .doc(credential.user!.uid)
                                   .get();
 
-                              if (userdb.exists) {
+                              if (userdb.exists && context.mounted) {
                                 var userType = userdb.data()!["userType"];
                                 if (userType == "UserType.donor") {
                                   Navigator.pushReplacement(
@@ -120,8 +124,11 @@ class _LoginPageState extends State<LoginPage> {
                                           builder: (context) =>
                                               const NGOHome()));
                                 }
-                              } else {
-                                // Handle case where user data does not exist in Firestore
+                              }
+                            } else {
+                              log('user not forund');
+                              if (context.mounted) {
+                                log('user mounted');
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                         content: Text(
@@ -137,26 +144,34 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             }
                           } on FirebaseAuthException catch (e) {
-                            if (e.code == 'user-not-found') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(e.code)));
-                              print('No user found for that email.');
-                            } else if (e.code == 'wrong-password') {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(e.code)));
-                              print('Wrong password provided for that user.');
+                            if (context.mounted) {
+                              if (e.code == 'user-not-found') {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.code)));
+                              } else if (e.code == 'wrong-password') {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(e.code)));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text(
+                                            'Login Error - Username or password is incorrect')));
+                              }
                             }
                           } catch (e) {
-                            print(e);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text('Some Error. Try again later')));
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content:
+                                          Text('Some Error. Try again later')));
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isloading = false;
+                              });
+                            }
                           }
-
-                          setState(() {
-                            _isloading = false;
-                          });
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(

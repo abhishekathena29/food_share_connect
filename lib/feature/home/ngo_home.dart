@@ -6,7 +6,7 @@ import '../auth/login.dart';
 import 'ngo_model.dart';
 
 List<Map<String, dynamic>> checkedFoodNGO = []; // Updated to include quantity
-int quantity = 0;
+// int quantity = 0;
 
 final List<Map<String, String>> foodItems = [
   {
@@ -247,7 +247,7 @@ class _NGOHomeState extends State<NGOHome> {
       itemCount: items.length,
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        mainAxisExtent: 300,
+        mainAxisExtent: 360,
         crossAxisSpacing: 10,
         mainAxisSpacing: 10,
       ),
@@ -280,6 +280,7 @@ class FoodCardNGO extends StatefulWidget {
 
 class _FoodCardNGOState extends State<FoodCardNGO> {
   bool isChecked = false;
+  int quantity = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -303,6 +304,13 @@ class _FoodCardNGOState extends State<FoodCardNGO> {
             borderRadius: BorderRadius.circular(20),
             child: Image.network(
               widget.imageUrl,
+              errorBuilder: (context, error, stackTrace) => const SizedBox(
+                height: 150,
+                child: Icon(
+                  Icons.image,
+                  color: Colors.white,
+                ),
+              ),
               fit: BoxFit.cover,
               height: 150,
               width: double.infinity,
@@ -313,6 +321,7 @@ class _FoodCardNGOState extends State<FoodCardNGO> {
           const SizedBox(height: 10),
           Text(
             widget.title,
+            textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,

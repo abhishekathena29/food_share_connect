@@ -109,7 +109,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     hintText: 'Address',
                     hintStyle: const TextStyle(color: Colors.white60),
                     filled: true,
-                    fillColor: Color(0xff1E1E1E),
+                    fillColor: const Color(0xff1E1E1E),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -192,9 +192,11 @@ class _RegisterPageState extends State<RegisterPage> {
                       ))
                     : GestureDetector(
                         onTap: () async {
-                          setState(() {
-                            _isloading = true;
-                          });
+                          if (mounted) {
+                            setState(() {
+                              _isloading = true;
+                            });
+                          }
                           try {
                             UserCredential userCredential = await FirebaseAuth
                                 .instance
@@ -213,32 +215,36 @@ class _RegisterPageState extends State<RegisterPage> {
                               "address": addreesscontroller.text,
                               "name": usernameController.text,
                             });
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text(
-                                        'Registration is Completed. Now you can login.')));
-                            Navigator.pop(context);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Registration is Completed. Now you can login.')));
+                              Navigator.pop(context);
+                            }
                           } on FirebaseAuthException catch (e) {
-                            if (e.code == 'weak-password') {
+                            if (e.code == 'weak-password' && context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(e.code)));
-                              print('The password provided is too weak.');
-                            } else if (e.code == 'email-already-in-use') {
+                            } else if (e.code == 'email-already-in-use' &&
+                                context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(content: Text(e.code)));
-                              print(
-                                  'The account already exists for that email.');
                             }
                           } catch (e) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text("Some Error. Try again later.")));
-                            print(e);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          "Some Error. Try again later.")));
+                            }
+                          } finally {
+                            if (mounted) {
+                              setState(() {
+                                _isloading = false;
+                              });
+                            }
                           }
-                          setState(() {
-                            _isloading = false;
-                          });
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
