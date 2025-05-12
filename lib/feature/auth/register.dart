@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:food_share_connect/utils/colors.dart';
 
 enum UserType { donor, ngo }
 
@@ -24,7 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff121212), // Dark background
+      backgroundColor: AppColors.backgroundColor, // Dark background
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -35,7 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const Text(
                   'FoodShare',
                   style: TextStyle(
-                    color: Color(0xff03DAC5), // Vibrant accent color
+                    color: AppColors.primaryColor, // Vibrant accent color
                     fontSize: 36,
                     fontWeight: FontWeight.bold,
                   ),
@@ -43,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 const Text(
                   'CONNECT',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textColor,
                     fontSize: 28,
                     letterSpacing: 2,
                   ),
@@ -51,12 +52,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 40),
                 TextField(
                   controller: usernameController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textColor,),
                   decoration: InputDecoration(
-                    hintText: 'Enter name',
-                    hintStyle: const TextStyle(color: Colors.white60),
+                    hintText: 'Name',
+                    hintStyle: const TextStyle(color:AppColors.textColor,),
                     filled: true,
-                    fillColor: const Color(0xff1E1E1E),
+                    fillColor: AppColors.inputBoxColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -68,12 +69,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 20),
                 TextField(
                   controller: emailController,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textColor,),
                   decoration: InputDecoration(
                     hintText: 'Email',
-                    hintStyle: const TextStyle(color: Colors.white60),
+                    hintStyle: const TextStyle(color: AppColors.textColor,),
                     filled: true,
-                    fillColor: const Color(0xff1E1E1E),
+                    fillColor: AppColors.inputBoxColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -86,13 +87,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextField(
                   controller: phonecontroller,
                   keyboardType: TextInputType.phone,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textColor),
                   maxLength: 10,
                   decoration: InputDecoration(
-                    hintText: 'Phone number',
-                    hintStyle: const TextStyle(color: Colors.white60),
+                    hintText: 'Phone',
+                    hintStyle: const TextStyle(color : AppColors.textColor,),
                     filled: true,
-                    fillColor: const Color(0xff1E1E1E),
+                    fillColor: AppColors.inputBoxColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -104,12 +105,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 20),
                 TextField(
                   controller: addreesscontroller,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textColor,),
                   decoration: InputDecoration(
                     hintText: 'Address',
-                    hintStyle: const TextStyle(color: Colors.white60),
+                    hintStyle: const TextStyle(color: AppColors.textColor,),
                     filled: true,
-                    fillColor: Color(0xff1E1E1E),
+                    fillColor: AppColors.inputBoxColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -122,12 +123,12 @@ class _RegisterPageState extends State<RegisterPage> {
                 TextField(
                   controller: passController,
                   obscureText: true,
-                  style: const TextStyle(color: Colors.white),
+                  style: const TextStyle(color: AppColors.textColor,),
                   decoration: InputDecoration(
                     hintText: 'Password',
-                    hintStyle: const TextStyle(color: Colors.white60),
+                    hintStyle: const TextStyle(color: AppColors.textColor,),
                     filled: true,
-                    fillColor: const Color(0xff1E1E1E),
+                    fillColor: AppColors.inputBoxColor,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                       borderSide: BorderSide.none,
@@ -138,26 +139,28 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Are you a:',
+                        'Join as a :',
                         style: TextStyle(
-                          color: Color(0xffB0B0B0),
+                          color: AppColors.textColor,
+                          fontWeight: FontWeight.bold
                         ),
                       ),
-                      const SizedBox(width: 20),
                       ListTile(
+                        contentPadding: const EdgeInsets.all(0),
                         title: const Text(
                           'Donor',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: AppColors.textColor,),
                         ),
+                        horizontalTitleGap: 0,
                         leading: Radio<UserType>(
                           value: UserType.donor,
                           groupValue: _character,
-                          activeColor: const Color(0xff03DAC5),
+                          activeColor:  AppColors.primaryColor,
                           onChanged: (UserType? value) {
                             setState(() {
                               _character = value;
@@ -166,14 +169,16 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                       ListTile(
+                        contentPadding: const EdgeInsets.all(0),
                         title: const Text(
                           'NGO',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: AppColors.textColor,),
                         ),
+                        horizontalTitleGap: 0,
                         leading: Radio<UserType>(
                           value: UserType.ngo,
                           groupValue: _character,
-                          activeColor: const Color(0xff03DAC5),
+                          activeColor: AppColors.primaryColor,
                           onChanged: (UserType? value) {
                             setState(() {
                               _character = value;
@@ -184,7 +189,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
                 _isloading
                     ? const Center(
                         child: CircularProgressIndicator(
@@ -244,18 +249,14 @@ class _RegisterPageState extends State<RegisterPage> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 40, vertical: 15),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xff03DAC5), Color(0xff00BFA5)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
+                           color: AppColors.primaryColor,
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: const Center(
                             child: Text(
                               'Register',
                               style: TextStyle(
-                                  fontSize: 20, color: Colors.black87),
+                                  fontSize: 20, color: AppColors.contrastTextColor),
                             ),
                           ),
                         ),
@@ -266,13 +267,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: const Text.rich(
                     TextSpan(
                       text: 'Already Registered? ',
-                      style: TextStyle(color: Color(0xffFFFFFF)),
+                      style: TextStyle(color: AppColors.textColor),
                       children: [
                         TextSpan(
                           text: 'Login',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Color(0xff03DAC5),
+                            color: AppColors.primaryColor,
                           ),
                         )
                       ],

@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:food_share_connect/feature/home/matchedpage.dart';
 
 class MatchedDonorPage extends StatefulWidget {
   final List<String> donorFoodItems;
@@ -204,9 +203,9 @@ class _MatchedDonorPageState extends State<MatchedDonorPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     // Donor's Selected Items
-                                    Text(
+                                    const Text(
                                       "Donor's Selected Items:",
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Color(
@@ -230,9 +229,9 @@ class _MatchedDonorPageState extends State<MatchedDonorPage> {
                                     ),
 
                                     // Matched Items
-                                    Text(
+                                    const Text(
                                       "Matched Items with NGO:",
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Color(

@@ -68,7 +68,7 @@ class _MatchedPageState extends State<MatchedPage> {
                 donorQuantity > ngoQuantity ? ngoQuantity : donorQuantity;
 
             matchedItems[ngoItemName] =
-                "$fulfilledQuantity of $ngoQuantity kg/pcs";
+                "$fulfilledQuantity of $ngoQuantity kg/Qty";
           }
         }
 
@@ -230,7 +230,7 @@ class _MatchedPageState extends State<MatchedPage> {
                                           color: Colors.white70,
                                         ),
                                       );
-                                    }).toList(),
+                                    }),
 
                                     const SizedBox(height: 10),
 
